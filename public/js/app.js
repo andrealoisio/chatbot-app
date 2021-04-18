@@ -1885,31 +1885,14 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 var default_layout = "default";
 var SUCCESS = 'success';
 var ERROR = 'error';
 var PASSWORD_PLACEHOLER = "****************";
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  mounted: function mounted() {
-    console.log('Component mounted.'); // axios.get('/api/test').then(response => console.log(response))
-    // axios.get('/api/test-auth').then(response => console.log(response))
-    // axios.post('/api/register', {
-    //     name: "André",
-    //     email: "andrealoisio@gmail.com",
-    //     password: "senhateste123",
-    //     password_confirmation: "senhateste123"
-    // }).then(response => console.log(response))
-    // axios.get('/sanctum/csrf-cookie').then(response => {
-    //     // console.log(response)
-    //     axios.post('/api/login', {
-    //         email: 'andrealoisio@gmail.com',
-    //         password: 'senhateste123'
-    //     }).then(response => {
-    //         console.log(response);
-    //         axios.get('/api/test-auth').then(response => console.log(response))
-    //     })
-    // });
-  },
+  mounted: function mounted() {},
   computed: {},
   data: function data() {
     return {
@@ -1925,9 +1908,11 @@ var PASSWORD_PLACEHOLER = "****************";
       }],
       text: "",
       nextAction: "",
+      loading: false,
       acceptedEntries: ['register', 'login', 'logout'],
       isTypingPassword: false,
       username: null,
+      defaultCurrency: null,
       email: null,
       password: null,
       password_confirmation: null
@@ -1962,6 +1947,13 @@ var PASSWORD_PLACEHOLER = "****************";
         case 'register-name':
           this.userMessage(entry);
           this.username = entry;
+          this.botMessage('Enter the currency code you want to use in your account');
+          this.nextAction = 'register-default-currency';
+          break;
+
+        case 'register-default-currency':
+          this.userMessage(entry);
+          this.defaultCurrency = entry;
           this.botMessage('Enter your e-mail');
           this.nextAction = 'register-email';
           break;
@@ -1988,11 +1980,13 @@ var PASSWORD_PLACEHOLER = "****************";
           this.botMessage('Trying to register');
           var registrationBody = {
             name: this.username,
+            default_currency: this.defaultCurrency,
             email: this.email,
             password: this.password,
             password_confirmation: this.password_confirmation
           };
           console.log(registrationBody);
+          this.loading = true;
           axios.post('/api/register', registrationBody).then(function (response) {
             console.log(response);
           })["catch"](function (error) {
@@ -2002,6 +1996,8 @@ var PASSWORD_PLACEHOLER = "****************";
 
               _this.botMessage(message, ERROR);
             }
+          })["finally"](function () {
+            return _this.loading = false;
           });
           this.nextAction = null;
           this.clearValues();
@@ -2024,6 +2020,7 @@ var PASSWORD_PLACEHOLER = "****************";
           this.isTypingPassword = false;
           this.nextAction = null;
           this.userMessage(PASSWORD_PLACEHOLER);
+          this.loading = true;
           axios.post('/api/login', {
             email: this.username,
             password: entry
@@ -2046,12 +2043,17 @@ var PASSWORD_PLACEHOLER = "****************";
             } else {
               _this.botMessage('Somethign went wrong!', ERROR);
             }
+          })["finally"](function () {
+            return _this.loading = false;
           });
           break;
 
         case 'logout':
+          this.loading = true;
           axios.post('/api/logout').then(function (response) {
             _this.botMessage('Successfully logged out!', SUCCESS);
+          })["finally"](function () {
+            return _this.loading = false;
           });
           break;
 
@@ -2096,6 +2098,7 @@ var PASSWORD_PLACEHOLER = "****************";
       this.password_confirmation = null;
       this.nextAction = null;
       this.isTypingPassword = false;
+      this.defaultCurrency = null;
     },
     invalidEntry: function invalidEntry(text) {
       if (this.nextAction) {
@@ -19714,7 +19717,22 @@ var render = function() {
                   ]
                 )
               ]
-            })
+            }),
+            _vm._v(" "),
+            _vm.loading
+              ? _c(
+                  "div",
+                  {
+                    staticClass: "spinner-border spinner-border-sm",
+                    attrs: { role: "status" }
+                  },
+                  [
+                    _c("span", { staticClass: "sr-only" }, [
+                      _vm._v("Loading...")
+                    ])
+                  ]
+                )
+              : _vm._e()
           ],
           2
         ),

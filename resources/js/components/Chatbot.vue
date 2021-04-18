@@ -2,7 +2,6 @@
     <div class="container">
         <div class="row">
             <div class="offset-md-3 col-md-6 border mt-5">
-
                 <div id="chat-messages" class="border mt-3 p-1" style="height: 400px; overflow-x: auto">
                     <template v-for="message in messages">
                         <!--                        <div v-bind:class="{ 'text-right' : message.from === 'user' }">-->
@@ -20,6 +19,9 @@
                             </div>
                         </div>
                     </template>
+                    <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
                 </div>
 
                 <div class="row">
@@ -45,29 +47,7 @@ const ERROR = 'error';
 const PASSWORD_PLACEHOLER = "****************";
 
 export default {
-    mounted() {
-        console.log('Component mounted.')
-        // axios.get('/api/test').then(response => console.log(response))
-        // axios.get('/api/test-auth').then(response => console.log(response))
-
-        // axios.post('/api/register', {
-        //     name: "André",
-        //     email: "andrealoisio@gmail.com",
-        //     password: "senhateste123",
-        //     password_confirmation: "senhateste123"
-        // }).then(response => console.log(response))
-
-        // axios.get('/sanctum/csrf-cookie').then(response => {
-        //     // console.log(response)
-        //     axios.post('/api/login', {
-        //         email: 'andrealoisio@gmail.com',
-        //         password: 'senhateste123'
-        //     }).then(response => {
-        //         console.log(response);
-        //         axios.get('/api/test-auth').then(response => console.log(response))
-        //     })
-        // });
-    },
+    mounted() {},
     computed: {},
     data() {
         return {
@@ -87,9 +67,11 @@ export default {
             ],
             text: "",
             nextAction: "",
+            loading: false,
             acceptedEntries: ['register', 'login', 'logout'],
             isTypingPassword: false,
             username: null,
+            defaultCurrency: null,
             email: null,
             password: null,
             password_confirmation: null
@@ -120,6 +102,12 @@ export default {
                 case 'register-name':
                     this.userMessage(entry)
                     this.username = entry
+                    this.botMessage('Enter the currency code you want to use in your account')
+                    this.nextAction = 'register-default-currency'
+                    break
+                case 'register-default-currency':
+                    this.userMessage(entry)
+                    this.defaultCurrency = entry
                     this.botMessage('Enter your e-mail')
                     this.nextAction = 'register-email'
                     break
@@ -143,11 +131,13 @@ export default {
                     this.botMessage('Trying to register')
                     const registrationBody = {
                         name: this.username,
+                        default_currency: this.defaultCurrency,
                         email: this.email,
                         password: this.password,
                         password_confirmation: this.password_confirmation
                     }
                     console.log(registrationBody)
+                    this.loading = true
                     axios.post('/api/register', registrationBody).then(response => {
                         console.log(response)
                     }).catch(error => {
@@ -156,7 +146,7 @@ export default {
                             const {message} = error.response.data
                             this.botMessage(message, ERROR)
                         }
-                    })
+                    }).finally(() => this.loading = false)
                     this.nextAction = null
                     this.clearValues()
                     break
@@ -175,6 +165,7 @@ export default {
                     this.isTypingPassword = false
                     this.nextAction = null
                     this.userMessage(PASSWORD_PLACEHOLER)
+                    this.loading = true
                     axios.post('/api/login', {
                         email: this.username,
                         password: entry
@@ -190,12 +181,13 @@ export default {
                         } else {
                             this.botMessage('Somethign went wrong!', ERROR)
                         }
-                    })
+                    }).finally(() => this.loading = false)
                     break
                 case 'logout':
+                    this.loading = true
                     axios.post('/api/logout').then(response => {
                         this.botMessage('Successfully logged out!', SUCCESS)
-                    });
+                    }).finally(() => this.loading = false);
                     break
                 default:
                     this.botMessage('Invalid option', ERROR)
@@ -231,6 +223,7 @@ export default {
             this.password_confirmation = null
             this.nextAction = null
             this.isTypingPassword = false
+            this.defaultCurrency = null
         },
         invalidEntry(text) {
             if (this.nextAction) {

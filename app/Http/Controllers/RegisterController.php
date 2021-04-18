@@ -15,11 +15,13 @@ class RegisterController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|confirmed|min:8',
+            'default_currency' => 'required|string|min:3|max:3',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'default_currency' => $request->default_currency,
             'password' => Hash::make($request->password),
         ]);
     }

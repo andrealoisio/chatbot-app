@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -31,3 +32,7 @@ Route::get('/test', function(){
 Route::post('/register', [RegisterController::class, 'create']);
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout']);
+
+Route::middleware(['auth:sanctum'])->group(function(){
+    Route::post('/transaction', [TransactionController::class, 'store']);
+});
