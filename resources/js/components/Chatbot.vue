@@ -2,11 +2,9 @@
     <div class="container">
         <div class="row">
             <div class="offset-md-3 col-md-6 border mt-5">
+                <h3 class="text-center mt-3">PHP Challenge<br>Chatbot App</h3>
                 <div id="chat-messages" class="border mt-3 p-1" style="height: 400px; overflow-x: auto">
                     <template v-for="message in messages">
-                        <!--                        <div v-bind:class="{ 'text-right' : message.from === 'user' }">-->
-                        <!--                            {{ message.text }}-->
-                        <!--                        </div>-->
                         <div v-bind:class="{ 'text-right' : message.from === 'user' }">
                             <div
                                 :class="{
@@ -24,16 +22,22 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <div class="col-10">
-                        <label class="sr-only" for="inlineFormInputName2">Name</label>
-                        <input :type="isTypingPassword ? 'password' : 'text'" class="form-control"
-                               id="inlineFormInputName2"
-                               placeholder="" v-model="text" v-on:keyup.enter="send(text)">
-                        {{ text }}
-                    </div>
-                    <div class="col-2">
-                        <button type="button" class="btn btn-primary mb-2" @click="send(text)">Enviar</button>
+<!--                <div class="row">-->
+<!--                    <div class="col-10">-->
+<!--                    </div>-->
+<!--                    <div class="col-2">-->
+<!--                        <button type="button" class="btn btn-primary mb-2" @click="send(text)">Send</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="input-group mb-3">
+                            <label class="sr-only" for="inlineFormInputName2">Name</label>
+                            <input :type="isTypingPassword ? 'password' : 'text'" class="form-control"
+                                   id="inlineFormInputName2"
+                                   placeholder="" v-model="text" v-on:keyup.enter="send(text)">
+                            <button @click="send(text)" class="btn btn-primary" type="button" id="button-addon2">Send</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -75,6 +79,7 @@ export default {
             email: null,
             password: null,
             password_confirmation: null
+            loggedIn: false
         }
     },
     methods: {
@@ -89,6 +94,7 @@ export default {
                 if (this.invalidEntry(text)) {
                     return
                 }
+                entry = text
                 action = text
             }
 
@@ -151,6 +157,7 @@ export default {
                     this.clearValues()
                     break
                 case 'login':
+                    this.userMessage(entry)
                     this.botMessage('Type in your username')
                     this.nextAction = 'enter-password'
                     break
@@ -173,6 +180,7 @@ export default {
                         console.log(response);
                         axios.get('/api/test-auth').then(_ => console.log(_))
                         this.botMessage('Login success!', SUCCESS)
+                        this.loggedIn = true
                         this.clearValues()
                     }).catch(error => {
                         if (error.response) {
@@ -187,6 +195,7 @@ export default {
                     this.loading = true
                     axios.post('/api/logout').then(response => {
                         this.botMessage('Successfully logged out!', SUCCESS)
+                        this.loggedIn = false
                     }).finally(() => this.loading = false);
                     break
                 default:

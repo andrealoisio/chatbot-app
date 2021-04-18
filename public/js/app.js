@@ -1838,282 +1838,9 @@ module.exports = {
 /*!**************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Chatbot.vue?vue&type=script&lang=js& ***!
   \**************************************************************************************************************************************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+/***/ (() => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
-/* harmony export */ });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-var default_layout = "default";
-var SUCCESS = 'success';
-var ERROR = 'error';
-var PASSWORD_PLACEHOLER = "****************";
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  mounted: function mounted() {},
-  computed: {},
-  data: function data() {
-    return {
-      messages: [{
-        from: 'bot',
-        text: 'Hello! Welcome to your bank account'
-      }, {
-        from: 'bot',
-        text: 'Choose one of the options below to start'
-      }, {
-        from: 'bot',
-        text: 'login register'
-      }],
-      text: "",
-      nextAction: "",
-      loading: false,
-      acceptedEntries: ['register', 'login', 'logout'],
-      isTypingPassword: false,
-      username: null,
-      defaultCurrency: null,
-      email: null,
-      password: null,
-      password_confirmation: null
-    };
-  },
-  methods: {
-    send: function send(text) {
-      var _this = this;
-
-      var entry = null;
-      var action = null;
-
-      if (this.nextAction) {
-        action = this.nextAction;
-        entry = text;
-      } else {
-        if (this.invalidEntry(text)) {
-          return;
-        }
-
-        action = text;
-      }
-
-      console.log(action);
-
-      switch (action) {
-        case 'register':
-          this.botMessage('Enter your name');
-          this.nextAction = 'register-name';
-          break;
-
-        case 'register-name':
-          this.userMessage(entry);
-          this.username = entry;
-          this.botMessage('Enter the currency code you want to use in your account');
-          this.nextAction = 'register-default-currency';
-          break;
-
-        case 'register-default-currency':
-          this.userMessage(entry);
-          this.defaultCurrency = entry;
-          this.botMessage('Enter your e-mail');
-          this.nextAction = 'register-email';
-          break;
-
-        case 'register-email':
-          this.userMessage(entry);
-          this.email = entry;
-          this.botMessage('Enter your password');
-          this.isTypingPassword = true;
-          this.nextAction = 'register-password';
-          break;
-
-        case 'register-password':
-          this.userMessage(PASSWORD_PLACEHOLER);
-          this.password = entry;
-          this.botMessage('Enter your password confirmation');
-          this.isTypingPassword = true;
-          this.nextAction = 'register-password-confirmation';
-          break;
-
-        case 'register-password-confirmation':
-          this.userMessage(PASSWORD_PLACEHOLER);
-          this.password_confirmation = entry;
-          this.botMessage('Trying to register');
-          var registrationBody = {
-            name: this.username,
-            default_currency: this.defaultCurrency,
-            email: this.email,
-            password: this.password,
-            password_confirmation: this.password_confirmation
-          };
-          console.log(registrationBody);
-          this.loading = true;
-          axios.post('/api/register', registrationBody).then(function (response) {
-            console.log(response);
-          })["catch"](function (error) {
-            if (error.response) {
-              console.log(error.response);
-              var message = error.response.data.message;
-
-              _this.botMessage(message, ERROR);
-            }
-          })["finally"](function () {
-            return _this.loading = false;
-          });
-          this.nextAction = null;
-          this.clearValues();
-          break;
-
-        case 'login':
-          this.botMessage('Type in your username');
-          this.nextAction = 'enter-password';
-          break;
-
-        case 'enter-password':
-          this.username = entry;
-          this.userMessage(this.username);
-          this.botMessage('Please enter your password');
-          this.isTypingPassword = true;
-          this.nextAction = 'try-login';
-          break;
-
-        case 'try-login':
-          this.isTypingPassword = false;
-          this.nextAction = null;
-          this.userMessage(PASSWORD_PLACEHOLER);
-          this.loading = true;
-          axios.post('/api/login', {
-            email: this.username,
-            password: entry
-          }).then(function (response) {
-            console.log(response);
-            axios.get('/api/test-auth').then(function (_) {
-              return console.log(_);
-            });
-
-            _this.botMessage('Login success!', SUCCESS);
-
-            _this.clearValues();
-          })["catch"](function (error) {
-            if (error.response) {
-              var _error$response$data = error.response.data,
-                  type = _error$response$data.type,
-                  message = _error$response$data.message;
-
-              _this.botMessage(message, type);
-            } else {
-              _this.botMessage('Somethign went wrong!', ERROR);
-            }
-          })["finally"](function () {
-            return _this.loading = false;
-          });
-          break;
-
-        case 'logout':
-          this.loading = true;
-          axios.post('/api/logout').then(function (response) {
-            _this.botMessage('Successfully logged out!', SUCCESS);
-          })["finally"](function () {
-            return _this.loading = false;
-          });
-          break;
-
-        default:
-          this.botMessage('Invalid option', ERROR);
-      }
-
-      if (text === "register") {}
-
-      this.text = "";
-    },
-    botMessage: function botMessage(text) {
-      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
-      this.messages.push({
-        from: 'bot',
-        text: text,
-        type: type
-      });
-      this.scroolChat();
-    },
-    userMessage: function userMessage(text) {
-      this.messages.push({
-        from: 'user',
-        text: text,
-        type: 'light'
-      });
-      this.scroolChat();
-    },
-    scroolChat: function scroolChat() {
-      var _this2 = this;
-
-      setTimeout(function () {
-        var objet = _this2.$el.querySelector('#chat-messages');
-
-        objet.scrollTop = objet.scrollHeight;
-      }, 0);
-    },
-    clearValues: function clearValues() {
-      this.username = null;
-      this.email = null;
-      this.password = null;
-      this.password_confirmation = null;
-      this.nextAction = null;
-      this.isTypingPassword = false;
-      this.defaultCurrency = null;
-    },
-    invalidEntry: function invalidEntry(text) {
-      if (this.nextAction) {
-        return false; // todo: pode tratar aqui a saida
-      }
-
-      if (this.acceptedEntries.indexOf(text) === -1) {
-        this.botMessage('Invalid option');
-        return true;
-      }
-
-      return false;
-    }
-  }
-});
+throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /var/www/html/resources/js/components/Chatbot.vue: Unexpected token, expected \",\" (82:12)\n\n\u001b[0m \u001b[90m 80 |\u001b[39m             password\u001b[33m:\u001b[39m \u001b[36mnull\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 81 |\u001b[39m             password_confirmation\u001b[33m:\u001b[39m \u001b[36mnull\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 82 |\u001b[39m             loggedIn\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 83 |\u001b[39m         }\u001b[0m\n\u001b[0m \u001b[90m 84 |\u001b[39m     }\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 85 |\u001b[39m     methods\u001b[33m:\u001b[39m {\u001b[0m\n    at Parser._raise (/var/www/html/node_modules/@babel/parser/lib/index.js:776:17)\n    at Parser.raiseWithData (/var/www/html/node_modules/@babel/parser/lib/index.js:769:17)\n    at Parser.raise (/var/www/html/node_modules/@babel/parser/lib/index.js:737:17)\n    at Parser.unexpected (/var/www/html/node_modules/@babel/parser/lib/index.js:9735:16)\n    at Parser.expect (/var/www/html/node_modules/@babel/parser/lib/index.js:9721:28)\n    at Parser.parseObjectLike (/var/www/html/node_modules/@babel/parser/lib/index.js:11479:14)\n    at Parser.parseExprAtom (/var/www/html/node_modules/@babel/parser/lib/index.js:11047:23)\n    at Parser.parseExprSubscripts (/var/www/html/node_modules/@babel/parser/lib/index.js:10708:23)\n    at Parser.parseUpdate (/var/www/html/node_modules/@babel/parser/lib/index.js:10688:21)\n    at Parser.parseMaybeUnary (/var/www/html/node_modules/@babel/parser/lib/index.js:10666:23)\n    at Parser.parseExprOps (/var/www/html/node_modules/@babel/parser/lib/index.js:10523:23)\n    at Parser.parseMaybeConditional (/var/www/html/node_modules/@babel/parser/lib/index.js:10497:23)\n    at Parser.parseMaybeAssign (/var/www/html/node_modules/@babel/parser/lib/index.js:10460:21)\n    at Parser.parseExpressionBase (/var/www/html/node_modules/@babel/parser/lib/index.js:10405:23)\n    at /var/www/html/node_modules/@babel/parser/lib/index.js:10399:39\n    at Parser.allowInAnd (/var/www/html/node_modules/@babel/parser/lib/index.js:12098:16)");
 
 /***/ }),
 
@@ -19681,6 +19408,8 @@ var render = function() {
   return _c("div", { staticClass: "container" }, [
     _c("div", { staticClass: "row" }, [
       _c("div", { staticClass: "offset-md-3 col-md-6 border mt-5" }, [
+        _vm._m(0),
+        _vm._v(" "),
         _c(
           "div",
           {
@@ -19708,9 +19437,9 @@ var render = function() {
                       },
                       [
                         _vm._v(
-                          "\n                            " +
+                          "\n                                " +
                             _vm._s(message.text) +
-                            "\n                        "
+                            "\n                            "
                         )
                       ]
                     )
@@ -19737,161 +19466,187 @@ var render = function() {
           2
         ),
         _vm._v(" "),
-        _c("div", { staticClass: "row" }, [
-          _c("div", { staticClass: "col-10" }, [
-            _c(
-              "label",
-              {
-                staticClass: "sr-only",
-                attrs: { for: "inlineFormInputName2" }
-              },
-              [_vm._v("Name")]
-            ),
-            _vm._v(" "),
-            (_vm.isTypingPassword ? "password" : "text") === "checkbox"
-              ? _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.text,
-                      expression: "text"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "inlineFormInputName2",
-                    placeholder: "",
-                    type: "checkbox"
-                  },
-                  domProps: {
-                    checked: Array.isArray(_vm.text)
-                      ? _vm._i(_vm.text, null) > -1
-                      : _vm.text
-                  },
-                  on: {
-                    keyup: function($event) {
-                      if (
-                        !$event.type.indexOf("key") &&
-                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                      ) {
-                        return null
+        _c("div", { staticClass: "row mt-3" }, [
+          _c("div", { staticClass: "col-md-12" }, [
+            _c("div", { staticClass: "input-group mb-3" }, [
+              _c(
+                "label",
+                {
+                  staticClass: "sr-only",
+                  attrs: { for: "inlineFormInputName2" }
+                },
+                [_vm._v("Name")]
+              ),
+              _vm._v(" "),
+              (_vm.isTypingPassword ? "password" : "text") === "checkbox"
+                ? _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.text,
+                        expression: "text"
                       }
-                      return _vm.send(_vm.text)
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      id: "inlineFormInputName2",
+                      placeholder: "",
+                      type: "checkbox"
                     },
-                    change: function($event) {
-                      var $$a = _vm.text,
-                        $$el = $event.target,
-                        $$c = $$el.checked ? true : false
-                      if (Array.isArray($$a)) {
-                        var $$v = null,
-                          $$i = _vm._i($$a, $$v)
-                        if ($$el.checked) {
-                          $$i < 0 && (_vm.text = $$a.concat([$$v]))
-                        } else {
-                          $$i > -1 &&
-                            (_vm.text = $$a
-                              .slice(0, $$i)
-                              .concat($$a.slice($$i + 1)))
+                    domProps: {
+                      checked: Array.isArray(_vm.text)
+                        ? _vm._i(_vm.text, null) > -1
+                        : _vm.text
+                    },
+                    on: {
+                      keyup: function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
                         }
-                      } else {
-                        _vm.text = $$c
+                        return _vm.send(_vm.text)
+                      },
+                      change: function($event) {
+                        var $$a = _vm.text,
+                          $$el = $event.target,
+                          $$c = $$el.checked ? true : false
+                        if (Array.isArray($$a)) {
+                          var $$v = null,
+                            $$i = _vm._i($$a, $$v)
+                          if ($$el.checked) {
+                            $$i < 0 && (_vm.text = $$a.concat([$$v]))
+                          } else {
+                            $$i > -1 &&
+                              (_vm.text = $$a
+                                .slice(0, $$i)
+                                .concat($$a.slice($$i + 1)))
+                          }
+                        } else {
+                          _vm.text = $$c
+                        }
                       }
                     }
-                  }
-                })
-              : (_vm.isTypingPassword ? "password" : "text") === "radio"
-              ? _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.text,
-                      expression: "text"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "inlineFormInputName2",
-                    placeholder: "",
-                    type: "radio"
-                  },
-                  domProps: { checked: _vm._q(_vm.text, null) },
-                  on: {
-                    keyup: function($event) {
-                      if (
-                        !$event.type.indexOf("key") &&
-                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                      ) {
-                        return null
+                  })
+                : (_vm.isTypingPassword ? "password" : "text") === "radio"
+                ? _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.text,
+                        expression: "text"
                       }
-                      return _vm.send(_vm.text)
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      id: "inlineFormInputName2",
+                      placeholder: "",
+                      type: "radio"
                     },
-                    change: function($event) {
-                      _vm.text = null
-                    }
-                  }
-                })
-              : _c("input", {
-                  directives: [
-                    {
-                      name: "model",
-                      rawName: "v-model",
-                      value: _vm.text,
-                      expression: "text"
-                    }
-                  ],
-                  staticClass: "form-control",
-                  attrs: {
-                    id: "inlineFormInputName2",
-                    placeholder: "",
-                    type: _vm.isTypingPassword ? "password" : "text"
-                  },
-                  domProps: { value: _vm.text },
-                  on: {
-                    keyup: function($event) {
-                      if (
-                        !$event.type.indexOf("key") &&
-                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
-                      ) {
-                        return null
+                    domProps: { checked: _vm._q(_vm.text, null) },
+                    on: {
+                      keyup: function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
+                        }
+                        return _vm.send(_vm.text)
+                      },
+                      change: function($event) {
+                        _vm.text = null
                       }
-                      return _vm.send(_vm.text)
+                    }
+                  })
+                : _c("input", {
+                    directives: [
+                      {
+                        name: "model",
+                        rawName: "v-model",
+                        value: _vm.text,
+                        expression: "text"
+                      }
+                    ],
+                    staticClass: "form-control",
+                    attrs: {
+                      id: "inlineFormInputName2",
+                      placeholder: "",
+                      type: _vm.isTypingPassword ? "password" : "text"
                     },
-                    input: function($event) {
-                      if ($event.target.composing) {
-                        return
+                    domProps: { value: _vm.text },
+                    on: {
+                      keyup: function($event) {
+                        if (
+                          !$event.type.indexOf("key") &&
+                          _vm._k(
+                            $event.keyCode,
+                            "enter",
+                            13,
+                            $event.key,
+                            "Enter"
+                          )
+                        ) {
+                          return null
+                        }
+                        return _vm.send(_vm.text)
+                      },
+                      input: function($event) {
+                        if ($event.target.composing) {
+                          return
+                        }
+                        _vm.text = $event.target.value
                       }
-                      _vm.text = $event.target.value
+                    }
+                  }),
+              _vm._v(" "),
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary",
+                  attrs: { type: "button", id: "button-addon2" },
+                  on: {
+                    click: function($event) {
+                      return _vm.send(_vm.text)
                     }
                   }
-                }),
-            _vm._v(
-              "\n                    " + _vm._s(_vm.text) + "\n                "
-            )
-          ]),
-          _vm._v(" "),
-          _c("div", { staticClass: "col-2" }, [
-            _c(
-              "button",
-              {
-                staticClass: "btn btn-primary mb-2",
-                attrs: { type: "button" },
-                on: {
-                  click: function($event) {
-                    return _vm.send(_vm.text)
-                  }
-                }
-              },
-              [_vm._v("Enviar")]
-            )
+                },
+                [_vm._v("Send")]
+              )
+            ])
           ])
         ])
       ])
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("h3", { staticClass: "text-center mt-3" }, [
+      _vm._v("PHP Challenge"),
+      _c("br"),
+      _vm._v("Chatbot App")
+    ])
+  }
+]
 render._withStripped = true
 
 
