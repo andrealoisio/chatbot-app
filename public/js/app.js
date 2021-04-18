@@ -1874,31 +1874,41 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var default_layout = "default";
+var SUCCESS = 'success';
+var ERROR = 'error';
+var PASSWORD_PLACEHOLER = "****************";
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
-    console.log('Component mounted.');
-    axios.get('/api/test').then(function (response) {
-      return console.log(response);
-    }); // axios.get('/api/test-auth').then(response => console.log(response))
-
-    /* axios.post('/api/register', {
-        name: "André",
-        email: "andrealoisio+2@gmail.com",
-        password: "senhateste123",
-        password_confirmation: "senhateste123"
-    }).then(response => console.log(response)) */
-
-    /* axios.get('/sanctum/csrf-cookie').then(response => {
-        // console.log(response)
-        axios.post('/api/login', {
-            email: 'andrealoisio@gmail.com',
-            password: 'senhateste123'
-        }).then(response => {
-            console.log(response);
-            axios.get('/api/test-auth').then(response => console.log(response))
-        })
-    }); */
+    console.log('Component mounted.'); // axios.get('/api/test').then(response => console.log(response))
+    // axios.get('/api/test-auth').then(response => console.log(response))
+    // axios.post('/api/register', {
+    //     name: "André",
+    //     email: "andrealoisio@gmail.com",
+    //     password: "senhateste123",
+    //     password_confirmation: "senhateste123"
+    // }).then(response => console.log(response))
+    // axios.get('/sanctum/csrf-cookie').then(response => {
+    //     // console.log(response)
+    //     axios.post('/api/login', {
+    //         email: 'andrealoisio@gmail.com',
+    //         password: 'senhateste123'
+    //     }).then(response => {
+    //         console.log(response);
+    //         axios.get('/api/test-auth').then(response => console.log(response))
+    //     })
+    // });
   },
   computed: {},
   data: function data() {
@@ -1913,12 +1923,14 @@ var default_layout = "default";
         from: 'bot',
         text: 'login register'
       }],
-      text: "login",
+      text: "",
       nextAction: "",
       acceptedEntries: ['register', 'login', 'logout'],
       isTypingPassword: false,
       username: null,
-      password: null
+      email: null,
+      password: null,
+      password_confirmation: null
     };
   },
   methods: {
@@ -1943,8 +1955,56 @@ var default_layout = "default";
 
       switch (action) {
         case 'register':
-          this.botMessage('Type in your username');
+          this.botMessage('Enter your name');
+          this.nextAction = 'register-name';
+          break;
+
+        case 'register-name':
+          this.userMessage(entry);
+          this.username = entry;
+          this.botMessage('Enter your e-mail');
+          this.nextAction = 'register-email';
+          break;
+
+        case 'register-email':
+          this.userMessage(entry);
+          this.email = entry;
+          this.botMessage('Enter your password');
           this.isTypingPassword = true;
+          this.nextAction = 'register-password';
+          break;
+
+        case 'register-password':
+          this.userMessage(PASSWORD_PLACEHOLER);
+          this.password = entry;
+          this.botMessage('Enter your password confirmation');
+          this.isTypingPassword = true;
+          this.nextAction = 'register-password-confirmation';
+          break;
+
+        case 'register-password-confirmation':
+          this.userMessage(PASSWORD_PLACEHOLER);
+          this.password_confirmation = entry;
+          this.botMessage('Trying to register');
+          var registrationBody = {
+            name: this.username,
+            email: this.email,
+            password: this.password,
+            password_confirmation: this.password_confirmation
+          };
+          console.log(registrationBody);
+          axios.post('/api/register', registrationBody).then(function (response) {
+            console.log(response);
+          })["catch"](function (error) {
+            if (error.response) {
+              console.log(error.response);
+              var message = error.response.data.message;
+
+              _this.botMessage(message, ERROR);
+            }
+          });
+          this.nextAction = null;
+          this.clearValues();
           break;
 
         case 'login':
@@ -1963,6 +2023,7 @@ var default_layout = "default";
         case 'try-login':
           this.isTypingPassword = false;
           this.nextAction = null;
+          this.userMessage(PASSWORD_PLACEHOLER);
           axios.post('/api/login', {
             email: this.username,
             password: entry
@@ -1972,22 +2033,30 @@ var default_layout = "default";
               return console.log(_);
             });
 
-            _this.botMessage('Login success!');
+            _this.botMessage('Login success!', SUCCESS);
 
             _this.clearValues();
           })["catch"](function (error) {
-            console.log(error);
+            if (error.response) {
+              var _error$response$data = error.response.data,
+                  type = _error$response$data.type,
+                  message = _error$response$data.message;
+
+              _this.botMessage(message, type);
+            } else {
+              _this.botMessage('Somethign went wrong!', ERROR);
+            }
           });
           break;
 
         case 'logout':
           axios.post('/api/logout').then(function (response) {
-            _this.botMessage('Successfully logged out!');
+            _this.botMessage('Successfully logged out!', SUCCESS);
           });
           break;
 
         default:
-          this.botMessage('Invalid option');
+          this.botMessage('Invalid option', ERROR);
       }
 
       if (text === "register") {}
@@ -1995,20 +2064,36 @@ var default_layout = "default";
       this.text = "";
     },
     botMessage: function botMessage(text) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
       this.messages.push({
         from: 'bot',
-        text: text
+        text: text,
+        type: type
       });
+      this.scroolChat();
     },
     userMessage: function userMessage(text) {
       this.messages.push({
         from: 'user',
-        text: text
+        text: text,
+        type: 'light'
       });
+      this.scroolChat();
+    },
+    scroolChat: function scroolChat() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        var objet = _this2.$el.querySelector('#chat-messages');
+
+        objet.scrollTop = objet.scrollHeight;
+      }, 0);
     },
     clearValues: function clearValues() {
       this.username = null;
+      this.email = null;
       this.password = null;
+      this.password_confirmation = null;
       this.nextAction = null;
       this.isTypingPassword = false;
     },
@@ -19595,17 +19680,39 @@ var render = function() {
       _c("div", { staticClass: "offset-md-3 col-md-6 border mt-5" }, [
         _c(
           "div",
-          { staticClass: "border mt-3 p-1", staticStyle: { height: "400px" } },
+          {
+            staticClass: "border mt-3 p-1",
+            staticStyle: { height: "400px", "overflow-x": "auto" },
+            attrs: { id: "chat-messages" }
+          },
           [
             _vm._l(_vm.messages, function(message) {
               return [
-                _c("div", [
-                  _vm._v(
-                    "\n                        " +
-                      _vm._s(message.text) +
-                      "\n                    "
-                  )
-                ])
+                _c(
+                  "div",
+                  { class: { "text-right": message.from === "user" } },
+                  [
+                    _c(
+                      "div",
+                      {
+                        class: {
+                          "alert p-0 d-inline": true,
+                          "alert-success": message.type === "success",
+                          "alert-danger": message.type === "error",
+                          "alert-light": message.type === "light"
+                        },
+                        attrs: { role: "alert" }
+                      },
+                      [
+                        _vm._v(
+                          "\n                            " +
+                            _vm._s(message.text) +
+                            "\n                        "
+                        )
+                      ]
+                    )
+                  ]
+                )
               ]
             })
           ],
@@ -19645,6 +19752,15 @@ var render = function() {
                       : _vm.text
                   },
                   on: {
+                    keyup: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      return _vm.send(_vm.text)
+                    },
                     change: function($event) {
                       var $$a = _vm.text,
                         $$el = $event.target,
@@ -19684,6 +19800,15 @@ var render = function() {
                   },
                   domProps: { checked: _vm._q(_vm.text, null) },
                   on: {
+                    keyup: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      return _vm.send(_vm.text)
+                    },
                     change: function($event) {
                       _vm.text = null
                     }
@@ -19706,6 +19831,15 @@ var render = function() {
                   },
                   domProps: { value: _vm.text },
                   on: {
+                    keyup: function($event) {
+                      if (
+                        !$event.type.indexOf("key") &&
+                        _vm._k($event.keyCode, "enter", 13, $event.key, "Enter")
+                      ) {
+                        return null
+                      }
+                      return _vm.send(_vm.text)
+                    },
                     input: function($event) {
                       if ($event.target.composing) {
                         return
