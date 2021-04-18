@@ -1850,16 +1850,38 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 var default_layout = "default";
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component mounted.');
     axios.get('/api/test').then(function (response) {
       return console.log(response);
-    });
-    axios.get('/api/test-auth').then(function (response) {
-      return console.log(response);
-    });
+    }); // axios.get('/api/test-auth').then(response => console.log(response))
+
     /* axios.post('/api/register', {
         name: "André",
         email: "andrealoisio+2@gmail.com",
@@ -1867,24 +1889,141 @@ var default_layout = "default";
         password_confirmation: "senhateste123"
     }).then(response => console.log(response)) */
 
-    axios.get('/sanctum/csrf-cookie').then(function (response) {
-      // console.log(response)
-      axios.post('/api/login', {
-        email: 'andrealoisio@gmail.com',
-        password: 'senhateste123'
-      }).then(function (response) {
-        console.log(response);
-        axios.get('/api/test-auth').then(function (response) {
-          return console.log(response);
-        });
-      });
-    });
+    /* axios.get('/sanctum/csrf-cookie').then(response => {
+        // console.log(response)
+        axios.post('/api/login', {
+            email: 'andrealoisio@gmail.com',
+            password: 'senhateste123'
+        }).then(response => {
+            console.log(response);
+            axios.get('/api/test-auth').then(response => console.log(response))
+        })
+    }); */
   },
   computed: {},
   data: function data() {
     return {
-      message: 'Hello World'
+      messages: [{
+        from: 'bot',
+        text: 'Hello! Welcome to your bank account'
+      }, {
+        from: 'bot',
+        text: 'Choose one of the options below to start'
+      }, {
+        from: 'bot',
+        text: 'login register'
+      }],
+      text: "login",
+      nextAction: "",
+      acceptedEntries: ['register', 'login', 'logout'],
+      isTypingPassword: false,
+      username: null,
+      password: null
     };
+  },
+  methods: {
+    send: function send(text) {
+      var _this = this;
+
+      var entry = null;
+      var action = null;
+
+      if (this.nextAction) {
+        action = this.nextAction;
+        entry = text;
+      } else {
+        if (this.invalidEntry(text)) {
+          return;
+        }
+
+        action = text;
+      }
+
+      console.log(action);
+
+      switch (action) {
+        case 'register':
+          this.botMessage('Type in your username');
+          this.isTypingPassword = true;
+          break;
+
+        case 'login':
+          this.botMessage('Type in your username');
+          this.nextAction = 'enter-password';
+          break;
+
+        case 'enter-password':
+          this.username = entry;
+          this.userMessage(this.username);
+          this.botMessage('Please enter your password');
+          this.isTypingPassword = true;
+          this.nextAction = 'try-login';
+          break;
+
+        case 'try-login':
+          this.isTypingPassword = false;
+          this.nextAction = null;
+          axios.post('/api/login', {
+            email: this.username,
+            password: entry
+          }).then(function (response) {
+            console.log(response);
+            axios.get('/api/test-auth').then(function (_) {
+              return console.log(_);
+            });
+
+            _this.botMessage('Login success!');
+
+            _this.clearValues();
+          })["catch"](function (error) {
+            console.log(error);
+          });
+          break;
+
+        case 'logout':
+          axios.post('/api/logout').then(function (response) {
+            _this.botMessage('Successfully logged out!');
+          });
+          break;
+
+        default:
+          this.botMessage('Invalid option');
+      }
+
+      if (text === "register") {}
+
+      this.text = "";
+    },
+    botMessage: function botMessage(text) {
+      this.messages.push({
+        from: 'bot',
+        text: text
+      });
+    },
+    userMessage: function userMessage(text) {
+      this.messages.push({
+        from: 'user',
+        text: text
+      });
+    },
+    clearValues: function clearValues() {
+      this.username = null;
+      this.password = null;
+      this.nextAction = null;
+      this.isTypingPassword = false;
+    },
+    invalidEntry: function invalidEntry(text) {
+      if (this.nextAction) {
+        return false; // todo: pode tratar aqui a saida
+      }
+
+      if (this.acceptedEntries.indexOf(text) === -1) {
+        this.botMessage('Invalid option');
+        return true;
+      }
+
+      return false;
+    }
   }
 });
 
@@ -19451,7 +19590,154 @@ var render = function() {
   var _vm = this
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
-  return _c("div", [_vm._v("\n    " + _vm._s(_vm.message) + "\n")])
+  return _c("div", { staticClass: "container" }, [
+    _c("div", { staticClass: "row" }, [
+      _c("div", { staticClass: "offset-md-3 col-md-6 border mt-5" }, [
+        _c(
+          "div",
+          { staticClass: "border mt-3 p-1", staticStyle: { height: "400px" } },
+          [
+            _vm._l(_vm.messages, function(message) {
+              return [
+                _c("div", [
+                  _vm._v(
+                    "\n                        " +
+                      _vm._s(message.text) +
+                      "\n                    "
+                  )
+                ])
+              ]
+            })
+          ],
+          2
+        ),
+        _vm._v(" "),
+        _c("div", { staticClass: "row" }, [
+          _c("div", { staticClass: "col-10" }, [
+            _c(
+              "label",
+              {
+                staticClass: "sr-only",
+                attrs: { for: "inlineFormInputName2" }
+              },
+              [_vm._v("Name")]
+            ),
+            _vm._v(" "),
+            (_vm.isTypingPassword ? "password" : "text") === "checkbox"
+              ? _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.text,
+                      expression: "text"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    id: "inlineFormInputName2",
+                    placeholder: "",
+                    type: "checkbox"
+                  },
+                  domProps: {
+                    checked: Array.isArray(_vm.text)
+                      ? _vm._i(_vm.text, null) > -1
+                      : _vm.text
+                  },
+                  on: {
+                    change: function($event) {
+                      var $$a = _vm.text,
+                        $$el = $event.target,
+                        $$c = $$el.checked ? true : false
+                      if (Array.isArray($$a)) {
+                        var $$v = null,
+                          $$i = _vm._i($$a, $$v)
+                        if ($$el.checked) {
+                          $$i < 0 && (_vm.text = $$a.concat([$$v]))
+                        } else {
+                          $$i > -1 &&
+                            (_vm.text = $$a
+                              .slice(0, $$i)
+                              .concat($$a.slice($$i + 1)))
+                        }
+                      } else {
+                        _vm.text = $$c
+                      }
+                    }
+                  }
+                })
+              : (_vm.isTypingPassword ? "password" : "text") === "radio"
+              ? _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.text,
+                      expression: "text"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    id: "inlineFormInputName2",
+                    placeholder: "",
+                    type: "radio"
+                  },
+                  domProps: { checked: _vm._q(_vm.text, null) },
+                  on: {
+                    change: function($event) {
+                      _vm.text = null
+                    }
+                  }
+                })
+              : _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.text,
+                      expression: "text"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: {
+                    id: "inlineFormInputName2",
+                    placeholder: "",
+                    type: _vm.isTypingPassword ? "password" : "text"
+                  },
+                  domProps: { value: _vm.text },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.text = $event.target.value
+                    }
+                  }
+                }),
+            _vm._v(
+              "\n                    " + _vm._s(_vm.text) + "\n                "
+            )
+          ]),
+          _vm._v(" "),
+          _c("div", { staticClass: "col-2" }, [
+            _c(
+              "button",
+              {
+                staticClass: "btn btn-primary mb-2",
+                attrs: { type: "button" },
+                on: {
+                  click: function($event) {
+                    return _vm.send(_vm.text)
+                  }
+                }
+              },
+              [_vm._v("Enviar")]
+            )
+          ])
+        ])
+      ])
+    ])
+  ])
 }
 var staticRenderFns = []
 render._withStripped = true
