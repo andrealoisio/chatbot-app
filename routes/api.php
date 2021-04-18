@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -17,3 +19,14 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::middleware('auth:sanctum')->get('/test-auth', function(){
+    return "OK-AUTH";
+});
+
+Route::get('/test', function(){
+    return "OK";
+});
+
+Route::post('/register', [RegisterController::class, 'create']);
+Route::post('/login', [LoginController::class, 'authenticate']);

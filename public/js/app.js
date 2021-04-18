@@ -1854,6 +1854,31 @@ var default_layout = "default";
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
     console.log('Component mounted.');
+    axios.get('/api/test').then(function (response) {
+      return console.log(response);
+    });
+    axios.get('/api/test-auth').then(function (response) {
+      return console.log(response);
+    });
+    /* axios.post('/api/register', {
+        name: "André",
+        email: "andrealoisio+2@gmail.com",
+        password: "senhateste123",
+        password_confirmation: "senhateste123"
+    }).then(response => console.log(response)) */
+
+    axios.get('/sanctum/csrf-cookie').then(function (response) {
+      // console.log(response)
+      axios.post('/api/login', {
+        email: 'andrealoisio@gmail.com',
+        password: 'senhateste123'
+      }).then(function (response) {
+        console.log(response);
+        axios.get('/api/test-auth').then(function (response) {
+          return console.log(response);
+        });
+      });
+    });
   },
   computed: {},
   data: function data() {
