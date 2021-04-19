@@ -28,7 +28,21 @@ Route::middleware('auth:sanctum')->get('/test-auth', function(){
     return "OK-AUTH";
 });
 
-Route::get('/test/{from}/{to}', function($from, $to){
+Route::get('/test/{value}/{from}/{to}', function($value, $from, $to){
+    $data = [
+        "ammount" => $value
+    ];
+    $validator = Validator::make($data,[
+        'ammount' => 'required|numeric',
+    ]);
+
+    $validator->after(function ($validator) {
+        $validator->errors()->add(
+            'currency_code', 'Invalid currency code'
+        );
+    });
+
+    $validator->validate();
 
     $from = strtoupper($from);
     $to = strtoupper($to);
@@ -58,8 +72,8 @@ Route::get('/test/{from}/{to}', function($from, $to){
     return [
         "from" => $from,
         "to" => $to,
-        "original" => 100,
-        "converted" => 100 / $rates[$from] * $rates[$to]
+        "original" => $value,
+        "converted" => $value / $rates[$from] * $rates[$to]
     ];
 });
 

@@ -1838,9 +1838,330 @@ module.exports = {
 /*!**************************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/babel-loader/lib/index.js??clonedRuleSet-5[0].rules[0].use[0]!./node_modules/vue-loader/lib/index.js??vue-loader-options!./resources/js/components/Chatbot.vue?vue&type=script&lang=js& ***!
   \**************************************************************************************************************************************************************************************************************/
-/***/ (() => {
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-throw new Error("Module build failed (from ./node_modules/babel-loader/lib/index.js):\nSyntaxError: /var/www/html/resources/js/components/Chatbot.vue: Unexpected token, expected \",\" (82:12)\n\n\u001b[0m \u001b[90m 80 |\u001b[39m             password\u001b[33m:\u001b[39m \u001b[36mnull\u001b[39m\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 81 |\u001b[39m             password_confirmation\u001b[33m:\u001b[39m \u001b[36mnull\u001b[39m\u001b[0m\n\u001b[0m\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 82 |\u001b[39m             loggedIn\u001b[33m:\u001b[39m \u001b[36mfalse\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m    |\u001b[39m             \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 83 |\u001b[39m         }\u001b[0m\n\u001b[0m \u001b[90m 84 |\u001b[39m     }\u001b[33m,\u001b[39m\u001b[0m\n\u001b[0m \u001b[90m 85 |\u001b[39m     methods\u001b[33m:\u001b[39m {\u001b[0m\n    at Parser._raise (/var/www/html/node_modules/@babel/parser/lib/index.js:776:17)\n    at Parser.raiseWithData (/var/www/html/node_modules/@babel/parser/lib/index.js:769:17)\n    at Parser.raise (/var/www/html/node_modules/@babel/parser/lib/index.js:737:17)\n    at Parser.unexpected (/var/www/html/node_modules/@babel/parser/lib/index.js:9735:16)\n    at Parser.expect (/var/www/html/node_modules/@babel/parser/lib/index.js:9721:28)\n    at Parser.parseObjectLike (/var/www/html/node_modules/@babel/parser/lib/index.js:11479:14)\n    at Parser.parseExprAtom (/var/www/html/node_modules/@babel/parser/lib/index.js:11047:23)\n    at Parser.parseExprSubscripts (/var/www/html/node_modules/@babel/parser/lib/index.js:10708:23)\n    at Parser.parseUpdate (/var/www/html/node_modules/@babel/parser/lib/index.js:10688:21)\n    at Parser.parseMaybeUnary (/var/www/html/node_modules/@babel/parser/lib/index.js:10666:23)\n    at Parser.parseExprOps (/var/www/html/node_modules/@babel/parser/lib/index.js:10523:23)\n    at Parser.parseMaybeConditional (/var/www/html/node_modules/@babel/parser/lib/index.js:10497:23)\n    at Parser.parseMaybeAssign (/var/www/html/node_modules/@babel/parser/lib/index.js:10460:21)\n    at Parser.parseExpressionBase (/var/www/html/node_modules/@babel/parser/lib/index.js:10405:23)\n    at /var/www/html/node_modules/@babel/parser/lib/index.js:10399:39\n    at Parser.allowInAnd (/var/www/html/node_modules/@babel/parser/lib/index.js:12098:16)");
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+var default_layout = "default";
+var SUCCESS = 'success';
+var ERROR = 'error';
+var PASSWORD_PLACEHOLER = "****************";
+
+var translateToAction = __webpack_require__(/*! ./translateToAction */ "./resources/js/components/translateToAction.js").translateToAction;
+
+var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js");
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
+  mounted: function mounted() {},
+  computed: {},
+  data: function data() {
+    return {
+      messages: [{
+        from: 'bot',
+        text: 'Hello! Welcome to your bank account'
+      }, {
+        from: 'bot',
+        text: 'Choose one of the options below to start'
+      }, {
+        from: 'bot',
+        text: 'login register'
+      }],
+      text: "",
+      nextAction: "",
+      loading: false,
+      acceptedEntries: ['register', 'login', 'logout'],
+      isTypingPassword: false,
+      username: null,
+      defaultCurrency: null,
+      email: null,
+      password: null,
+      password_confirmation: null,
+      loggedIn: true,
+      ammount: null,
+      currencyCode: null
+    };
+  },
+  methods: {
+    send: function send(text) {
+      var _this = this;
+
+      var entry = null;
+      var action = null;
+      var actions = null;
+      entry = text;
+      this.text = null;
+      this.userMessage(entry);
+
+      if (this.nextAction) {
+        action = this.nextAction;
+      } else {
+        this.text = null;
+        actions = translateToAction(entry, this.loggedIn);
+        console.log(actions);
+
+        if (!actions.length || actions.length > 1) {
+          this.botMessage("Sorry, I didn't undertand your request", ERROR);
+          return;
+        }
+
+        action = actions[0].name;
+      }
+
+      console.log(action);
+
+      switch (action) {
+        case 'register':
+          this.botMessage('Enter your name');
+          this.nextAction = 'register-name';
+          break;
+
+        case 'register-name':
+          this.username = entry;
+          this.botMessage('Enter the currency code you want to use in your account');
+          this.nextAction = 'register-default-currency';
+          break;
+
+        case 'register-default-currency':
+          this.defaultCurrency = entry;
+          this.botMessage('Enter your e-mail');
+          this.nextAction = 'register-email';
+          break;
+
+        case 'register-email':
+          this.email = entry;
+          this.botMessage('Enter your password');
+          this.isTypingPassword = true;
+          this.nextAction = 'register-password';
+          break;
+
+        case 'register-password':
+          this.password = entry;
+          this.botMessage('Enter your password confirmation');
+          this.isTypingPassword = true;
+          this.nextAction = 'register-password-confirmation';
+          break;
+
+        case 'register-password-confirmation':
+          this.password_confirmation = entry;
+          this.botMessage('Trying to register');
+          var registrationBody = {
+            name: this.username,
+            default_currency: this.defaultCurrency,
+            email: this.email,
+            password: this.password,
+            password_confirmation: this.password_confirmation
+          };
+          console.log(registrationBody);
+          this.loading = true;
+          axios.post('/api/register', registrationBody).then(function (response) {
+            console.log(response);
+          })["catch"](function (error) {
+            if (error.response) {
+              console.log(error.response);
+              var message = error.response.data.message;
+
+              _this.botMessage(message, ERROR);
+            }
+          })["finally"](function () {
+            return _this.loading = false;
+          });
+          this.nextAction = null;
+          this.clearValues();
+          break;
+
+        case 'login':
+          this.botMessage('Enter your email');
+          this.nextAction = 'enter-password';
+          break;
+
+        case 'enter-password':
+          this.username = entry;
+          this.botMessage('Please enter your password');
+          this.isTypingPassword = true;
+          this.nextAction = 'try-login';
+          break;
+
+        case 'try-login':
+          this.isTypingPassword = false;
+          this.nextAction = null;
+          this.loading = true;
+          axios.post('/api/login', {
+            email: this.username,
+            password: entry
+          }).then(function (response) {
+            console.log(response);
+            axios.get('/api/test-auth').then(function (_) {
+              return console.log(_);
+            });
+
+            _this.botMessage('Login success!', SUCCESS);
+
+            _this.loggedIn = true;
+
+            _this.clearValues();
+          })["catch"](function (error) {
+            if (error.response) {
+              var _error$response$data = error.response.data,
+                  type = _error$response$data.type,
+                  message = _error$response$data.message;
+
+              _this.botMessage(message, type);
+            } else {
+              _this.botMessage('Somethign went wrong!', ERROR);
+            }
+          })["finally"](function () {
+            return _this.loading = false;
+          });
+          break;
+
+        case 'deposit':
+          var extractedAmmount = util.extractMoney(entry);
+
+          if (extractedAmmount) {
+            this.ammount = extractedAmmount;
+            this.currencyCode = util.extractCurrencyCode(entry);
+            this.botMessage('Trying to send your deposit of ' + this.ammount + " " + this.currencyCode);
+            this.clearValues();
+          } else {
+            this.botMessage('Enter the ammout you want to deposit');
+            this.nextAction = 'deposit-ask-ammount';
+          }
+
+          break;
+
+        case 'deposit-ask-ammount':
+          var ammountAsked = util.extractMoney(entry);
+          this.ammount = ammountAsked;
+          this.botMessage('Trying to send your deposit of ' + this.ammount);
+          this.clearValues();
+          break;
+
+        case 'withdraw':
+          var withDrawAmmount = util.extractMoney(entry);
+
+          if (withDrawAmmount) {
+            this.ammount = withDrawAmmount;
+            this.botMessage('Trying to send your withdraw of ' + this.ammount);
+            this.clearValues();
+          } else {
+            this.botMessage('Enter the ammout you want to withdraw');
+            this.nextAction = 'deposit-ask-ammount';
+          }
+
+          break;
+          break;
+
+        case 'logout':
+          this.loading = true;
+          axios.post('/api/logout').then(function (response) {
+            _this.botMessage('Successfully logged out!', SUCCESS);
+
+            _this.loggedIn = false;
+          })["finally"](function () {
+            return _this.loading = false;
+          });
+          break;
+
+        default:
+          this.botMessage('Invalid option', ERROR);
+      }
+
+      if (text === "register") {}
+
+      this.text = "";
+    },
+    botMessage: function botMessage(text) {
+      var type = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : '';
+      this.messages.push({
+        from: 'bot',
+        text: text,
+        type: type
+      });
+      this.scroolChat();
+    },
+    userMessage: function userMessage(text) {
+      if (this.isTypingPassword) {
+        text = PASSWORD_PLACEHOLER;
+      }
+
+      this.messages.push({
+        from: 'user',
+        text: text,
+        type: 'light'
+      });
+      this.scroolChat();
+    },
+    scroolChat: function scroolChat() {
+      var _this2 = this;
+
+      setTimeout(function () {
+        var objet = _this2.$el.querySelector('#chat-messages');
+
+        objet.scrollTop = objet.scrollHeight;
+      }, 0);
+    },
+    clearValues: function clearValues() {
+      this.username = null;
+      this.email = null;
+      this.password = null;
+      this.password_confirmation = null;
+      this.nextAction = null;
+      this.isTypingPassword = false;
+      this.defaultCurrency = null;
+      this.ammount = null;
+      this.currencyCode = null;
+    }
+  }
+});
 
 /***/ }),
 
@@ -1895,6 +2216,101 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/***/ }),
+
+/***/ "./resources/js/components/defaultCurrencies.js":
+/*!******************************************************!*\
+  !*** ./resources/js/components/defaultCurrencies.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+exports.defaultCurrencies = ["AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "AUD", "AWG", "AZN", "BAM", "BBD", "BDT", "BGN", "BHD", "BIF", "BMD", "BND", "BOB", "BRL", "BSD", "BTC", "BTN", "BWP", "BYN", "BYR", "BZD", "CAD", "CDF", "CHF", "CLF", "CLP", "CNY", "COP", "CRC", "CUC", "CUP", "CVE", "CZK", "DJF", "DKK", "DOP", "DZD", "EGP", "ERN", "ETB", "EUR", "FJD", "FKP", "GBP", "GEL", "GGP", "GHS", "GIP", "GMD", "GNF", "GTQ", "GYD", "HKD", "HNL", "HRK", "HTG", "HUF", "IDR", "ILS", "IMP", "INR", "IQD", "IRR", "ISK", "JEP", "JMD", "JOD", "JPY", "KES", "KGS", "KHR", "KMF", "KPW", "KRW", "KWD", "KYD", "KZT", "LAK", "LBP", "LKR", "LRD", "LSL", "LTL", "LVL", "LYD", "MAD", "MDL", "MGA", "MKD", "MMK", "MNT", "MOP", "MRO", "MUR", "MVR", "MWK", "MXN", "MYR", "MZN", "NAD", "NGN", "NIO", "NOK", "NPR", "NZD", "OMR", "PAB", "PEN", "PGK", "PHP", "PKR", "PLN", "PYG", "QAR", "RON", "RSD", "RUB", "RWF", "SAR", "SBD", "SCR", "SDG", "SEK", "SGD", "SHP", "SLL", "SOS", "SRD", "STD", "SVC", "SYP", "SZL", "THB", "TJS", "TMT", "TND", "TOP", "TRY", "TTD", "TWD", "TZS", "UAH", "UGX", "USD", "UYU", "UZS", "VEF", "VND", "VUV", "WST", "XAF", "XAG", "XAU", "XCD", "XDR", "XOF", "XPF", "YER", "ZAR", "ZMK", "ZMW", "ZWL"];
+
+/***/ }),
+
+/***/ "./resources/js/components/translateToAction.js":
+/*!******************************************************!*\
+  !*** ./resources/js/components/translateToAction.js ***!
+  \******************************************************/
+/***/ ((__unused_webpack_module, exports) => {
+
+var actions = [{
+  name: "login",
+  triggers: "login log-in"
+}, {
+  name: "register",
+  triggers: "signup register"
+}];
+var loggedinActions = [{
+  name: "deposit",
+  triggers: "deposit"
+}, {
+  name: "withdraw",
+  triggers: "withdraw"
+}, {
+  name: "show",
+  triggers: "balance funds"
+}, {
+  name: "logout",
+  triggers: "logout"
+}];
+
+var translateToAction = function translateToAction(text) {
+  var loggedIn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+  var sanitizedText = text.toLocaleLowerCase().replace("-", "");
+  var actionList = actions;
+
+  if (loggedIn) {
+    actionList = actionList.concat(loggedinActions);
+  }
+
+  var action = actionList.filter(function (action) {
+    var match = false;
+    action.triggers.split(" ").forEach(function (trigger) {
+      if (sanitizedText.indexOf(trigger) !== -1) {
+        match = true;
+      }
+    });
+    return match;
+  });
+  return action;
+};
+
+exports.translateToAction = translateToAction;
+
+/***/ }),
+
+/***/ "./resources/js/components/util.js":
+/*!*****************************************!*\
+  !*** ./resources/js/components/util.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+var defaulCurrencies = __webpack_require__(/*! ./defaultCurrencies */ "./resources/js/components/defaultCurrencies.js").defaultCurrencies;
+
+var extractMoney = function extractMoney(text) {
+  var onlyNumbers = text.replace(/[^\.0-9]/g, "");
+
+  if (isNaN(onlyNumbers)) {
+    return undefined;
+  }
+
+  return Number(onlyNumbers);
+};
+
+var extractCurrencyCode = function extractCurrencyCode(text) {
+  var currencyList = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : defaulCurrencies;
+  var currencycode = text.split(" ").filter(function (word) {
+    return word.length === 3 && currencyList.indexOf(word.toUpperCase()) !== -1;
+  }).map(function (code) {
+    return code.toUpperCase();
+  });
+  return currencycode[0];
+};
+
+exports.extractMoney = extractMoney;
+exports.extractCurrencyCode = extractCurrencyCode;
 
 /***/ }),
 

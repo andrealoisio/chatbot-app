@@ -123,7 +123,11 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
-    'rates_expiration_time' => env('RATES_EXPIRATION_TIME', 1800),
+    'rates_expiration_time' => env('RATES_EXPIRATION_TIME', 2700),
+
+    'currency_api_url' => env('CURRENCY_API_URL', null),
+
+    'currency_api_key' => env('CURRENCY_API_KEY', '782fd0a3c4253af5b9dc67b173a586d5'),
 
     /*
     |--------------------------------------------------------------------------

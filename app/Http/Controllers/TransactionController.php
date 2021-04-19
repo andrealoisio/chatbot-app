@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Redis;
 
 class TransactionController extends Controller
 {
@@ -49,6 +50,26 @@ class TransactionController extends Controller
         ]);
         $user->account_balance = $new_account_balance;
         $user->save();
+    }
+
+    private function get_rates(){
+        $rates = Redis::get('rates');
+        if ($rates == null) {
+            Log::info("Currency conversion cache not found, call the api");
+            $response = Http::get(config('currency_api_url').config('app.currency_api_key'));
+            $rates = $response->json()["rates"];
+            Redis::set('rates', json_encode($rates));
+            Redis::expire('rates', config('app.rates_expiration_time'));
+        } else {
+            $rates = (array)json_decode($rates);
+            Log::info("Currency convertion cache found");
+        }
+        return $rates;
+    }
+
+    private function get_currency_list() {
+        $rates = $this->get_rates();
+        dd($rates);
     }
 
     /**

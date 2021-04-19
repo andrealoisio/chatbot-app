@@ -49,9 +49,13 @@ const default_layout = "default";
 const SUCCESS = 'success';
 const ERROR = 'error';
 const PASSWORD_PLACEHOLER = "****************";
+const translateToAction = require('./translateToAction').translateToAction
+const util = require('./util')
 
 export default {
-    mounted() {},
+    mounted() {
+
+    },
     computed: {},
     data() {
         return {
@@ -78,8 +82,10 @@ export default {
             defaultCurrency: null,
             email: null,
             password: null,
-            password_confirmation: null
-            loggedIn: false
+            password_confirmation: null,
+            loggedIn: true,
+            ammount: null,
+            currencyCode: null
         }
     },
     methods: {
@@ -87,15 +93,21 @@ export default {
 
             var entry = null
             var action = null
+            var actions = null
+            entry = text
+            this.text = null
+            this.userMessage(entry)
             if (this.nextAction) {
                 action = this.nextAction
-                entry = text
             } else {
-                if (this.invalidEntry(text)) {
+                this.text = null
+                actions = translateToAction(entry, this.loggedIn);
+                console.log(actions)
+                if (!actions.length || actions.length > 1) {
+                    this.botMessage("Sorry, I didn't undertand your request", ERROR)
                     return
                 }
-                entry = text
-                action = text
+                action = actions[0].name
             }
 
             console.log(action)
@@ -106,33 +118,28 @@ export default {
                     this.nextAction = 'register-name'
                     break
                 case 'register-name':
-                    this.userMessage(entry)
                     this.username = entry
                     this.botMessage('Enter the currency code you want to use in your account')
                     this.nextAction = 'register-default-currency'
                     break
                 case 'register-default-currency':
-                    this.userMessage(entry)
                     this.defaultCurrency = entry
                     this.botMessage('Enter your e-mail')
                     this.nextAction = 'register-email'
                     break
                 case 'register-email':
-                    this.userMessage(entry)
                     this.email = entry
                     this.botMessage('Enter your password')
                     this.isTypingPassword = true
                     this.nextAction = 'register-password'
                     break
                 case 'register-password':
-                    this.userMessage(PASSWORD_PLACEHOLER)
                     this.password = entry
                     this.botMessage('Enter your password confirmation')
                     this.isTypingPassword = true
                     this.nextAction = 'register-password-confirmation'
                     break
                 case 'register-password-confirmation':
-                    this.userMessage(PASSWORD_PLACEHOLER)
                     this.password_confirmation = entry
                     this.botMessage('Trying to register')
                     const registrationBody = {
@@ -157,13 +164,11 @@ export default {
                     this.clearValues()
                     break
                 case 'login':
-                    this.userMessage(entry)
-                    this.botMessage('Type in your username')
+                    this.botMessage('Enter your email')
                     this.nextAction = 'enter-password'
                     break
                 case 'enter-password':
                     this.username = entry
-                    this.userMessage(this.username)
                     this.botMessage('Please enter your password')
                     this.isTypingPassword = true
                     this.nextAction = 'try-login'
@@ -171,7 +176,6 @@ export default {
                 case 'try-login':
                     this.isTypingPassword = false
                     this.nextAction = null
-                    this.userMessage(PASSWORD_PLACEHOLER)
                     this.loading = true
                     axios.post('/api/login', {
                         email: this.username,
@@ -190,6 +194,36 @@ export default {
                             this.botMessage('Somethign went wrong!', ERROR)
                         }
                     }).finally(() => this.loading = false)
+                    break
+                case 'deposit':
+                    let extractedAmmount = util.extractMoney(entry)
+                    if (extractedAmmount) {
+                        this.ammount = extractedAmmount
+                        this.currencyCode = util.extractCurrencyCode(entry)
+                        this.botMessage('Trying to send your deposit of ' + this.ammount + " " + this.currencyCode)
+                        this.clearValues()
+                    } else {
+                        this.botMessage('Enter the ammout you want to deposit')
+                        this.nextAction = 'deposit-ask-ammount'
+                    }
+                    break
+                case 'deposit-ask-ammount':
+                    let ammountAsked = util.extractMoney(entry)
+                    this.ammount = ammountAsked
+                    this.botMessage('Trying to send your deposit of ' + this.ammount)
+                    this.clearValues()
+                    break
+                case 'withdraw':
+                    const withDrawAmmount = util.extractMoney(entry)
+                    if (withDrawAmmount) {
+                        this.ammount = withDrawAmmount
+                        this.botMessage('Trying to send your withdraw of ' + this.ammount)
+                        this.clearValues()
+                    } else {
+                        this.botMessage('Enter the ammout you want to withdraw')
+                        this.nextAction = 'deposit-ask-ammount'
+                    }
+                    break
                     break
                 case 'logout':
                     this.loading = true
@@ -214,6 +248,9 @@ export default {
             this.scroolChat()
         },
         userMessage: function (text) {
+            if (this.isTypingPassword) {
+                text = PASSWORD_PLACEHOLER
+            }
             this.messages.push({
                 from: 'user', text, type: 'light'
             })
@@ -233,18 +270,9 @@ export default {
             this.nextAction = null
             this.isTypingPassword = false
             this.defaultCurrency = null
+            this.ammount = null
+            this.currencyCode = null
         },
-        invalidEntry(text) {
-            if (this.nextAction) {
-                return false
-                // todo: pode tratar aqui a saida
-            }
-            if (this.acceptedEntries.indexOf(text) === -1) {
-                this.botMessage('Invalid option')
-                return true
-            }
-            return false
-        }
     }
 };
 </script>
