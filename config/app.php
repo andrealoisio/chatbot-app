@@ -123,6 +123,8 @@ return [
 
     'cipher' => 'AES-256-CBC',
 
+    'rates_expiration_time' => env('RATES_EXPIRATION_TIME', 1800),
+
     /*
     |--------------------------------------------------------------------------
     | Autoloaded Service Providers
