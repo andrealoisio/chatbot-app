@@ -2193,7 +2193,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
       axios.get('/api/account-balance').then(function (response) {
         var data = response.data;
 
-        _this6.botMessage('Your account balance: ' + data.account_balance + " " + data.default_currency, SUCCESS);
+        _this6.botMessage('Your account balance is ' + data.account_balance + " " + data.default_currency, SUCCESS);
       })["catch"](function (error) {
         return _this6.showErrors(error.response.data);
       })["finally"](function () {

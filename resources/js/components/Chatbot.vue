@@ -279,7 +279,7 @@ export default {
         getAccountBalance: function() {
             axios.get('/api/account-balance').then(response => {
                 const { data } = response
-                this.botMessage('Your account balance: ' + data.account_balance + " " + data.default_currency, SUCCESS)
+                this.botMessage('Your account balance is ' + data.account_balance + " " + data.default_currency, SUCCESS)
             }).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
         },
         clearValues: function () {

@@ -31,6 +31,6 @@ Route::post('/logout', [LoginController::class, 'logout']);
 Route::middleware(['auth:sanctum'])->group(function(){
     Route::post('/transaction', [TransactionController::class, 'store']);
     Route::get('/account-balance', function(){
-        return auth()->user();
+        return auth()->user(['name']);
     });
 });
