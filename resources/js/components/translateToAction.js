@@ -1,23 +1,16 @@
 const actions = [
-    { name: "login", triggers: "login log-in" },
-    { name: "register", triggers: "signup register" }
+    {name: "login", triggers: "login log-in", mustBeLoggedin: false},
+    {name: "register", triggers: "signup register", mustBeLoggedin: false},
+    {name: "deposit", triggers: "deposit", mustBeLoggedin: true},
+    {name: "withdraw", triggers: "withdraw", mustBeLoggedin: true},
+    {name: "account-balance", triggers: "balance funds", mustBeLoggedin: true},
+    {name: "logout", triggers: "logout", mustBeLoggedin: true}
 ]
 
-const loggedinActions = [
-    { name: "deposit", triggers: "deposit" },
-    { name: "withdraw", triggers: "withdraw" },
-    { name: "account-balance", triggers: "balance funds" },
-    { name: "logout", triggers: "logout" }
-]
-
-const translateToAction = (text, loggedIn = false) => {
+const translateToAction = (text) => {
     let sanitizedText = text.toLocaleLowerCase().replace("-", "")
-    let actionList = actions
-    if (loggedIn) {
-        actionList = actionList.concat(loggedinActions)
-    }
 
-    let action = actionList.filter(action => {
+    let action = actions.filter(action => {
         let match = false
         action.triggers.split(" ").forEach(trigger => {
             if (sanitizedText.indexOf(trigger) !== -1) {

@@ -1,9 +1,10 @@
 <template>
     <div class="container">
         <div class="row">
-            <div class="offset-md-3 col-md-6 border mt-5">
+            <div class="offset-md-3 col-md-6 border mt-5 rounded">
                 <h3 class="text-center mt-3">PHP Challenge<br>Chatbot App</h3>
-                <div id="chat-messages" class="border mt-3 p-1" style="height: 400px; overflow-x: auto">
+                <div id="chat-messages" class="border mt-3 p-3 rounded" style="height: 400px; overflow-x: auto">
+                    <div style="margin-top: 300px">
                     <template v-for="message in messages">
                         <div v-bind:class="{ 'text-right' : message.from === 'user' }">
                             <div
@@ -19,6 +20,7 @@
                     </template>
                     <div v-if="loading" class="spinner-border spinner-border-sm" role="status">
                         <span class="sr-only">Loading...</span>
+                    </div>
                     </div>
                 </div>
                 <div class="row mt-3">
@@ -59,11 +61,7 @@ export default {
                 },
                 {
                     from: 'bot',
-                    text: 'Choose one of the options below to start',
-                },
-                {
-                    from: 'bot',
-                    text: 'login register'
+                    text: 'How can I help you?',
                 },
             ],
             text: "",
@@ -76,7 +74,7 @@ export default {
             email: null,
             password: null,
             password_confirmation: null,
-            loggedIn: true,
+            loggedIn: false,
             amount: null,
             currencyCode: null
         }
@@ -92,16 +90,17 @@ export default {
                 action = this.nextAction
             } else {
                 this.text = null
-                actions = translateToAction(entry, this.loggedIn);
-                console.log(actions)
+                actions = translateToAction(entry);
                 if (!actions.length || actions.length > 1) {
                     this.botMessage("Sorry, I didn't undertand your request", ERROR)
                     return
                 }
+                if (actions[0].mustBeLoggedin && !this.loggedIn) {
+                    this.botMessage("You must be logged in to execute this action", ERROR)
+                    return
+                }
                 action = actions[0].name
             }
-
-            console.log(action)
 
             switch (action) {
                 case 'register':
@@ -140,7 +139,6 @@ export default {
                         password: this.password,
                         password_confirmation: this.password_confirmation
                     }
-                    console.log(registrationBody)
                     this.loading = true
                     axios.post('/api/register', registrationBody).then(response => {
                         this.botMessage('Signed up successfully! You can now log in.', SUCCESS)
@@ -166,7 +164,6 @@ export default {
                         email: this.username,
                         password: entry
                     }).then(response => {
-                        axios.get('/api/test-auth').then(_ => console.log(_))
                         this.botMessage('Login success!', SUCCESS)
                         this.loggedIn = true
                         this.clearValues()
@@ -260,7 +257,10 @@ export default {
                 type: 'DEPOSIT',
                 amount: this.amount,
                 currency_code: this.currencyCode
-            }).then(response => console.log(response)).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
+            }).then(response => {
+                this.botMessage('Deposit successful', SUCCESS)
+                this.getAccountBalance()
+            }).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
         },
         sendWithdraw: function () {
             this.loading = true
@@ -268,7 +268,13 @@ export default {
                 type: 'WITHDRAW',
                 amount: this.amount,
                 currency_code: this.currencyCode
-            }).then(response => console.log(response)).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
+            }).then(response => {
+                this.botMessage('Withdraw successful', SUCCESS)
+                this.getAccountBalance()
+            }).catch(error => {
+                this.showErrors(error.response.data);
+                this.getAccountBalance()
+            }).finally(() => this.loading = false)
         },
         showErrors: function (errorObject) {
             this.loading = true

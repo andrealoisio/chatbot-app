@@ -1884,6 +1884,8 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
 var default_layout = "default";
 var SUCCESS = 'success';
 var ERROR = 'error';
@@ -1903,10 +1905,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         text: 'Hello! Welcome to your bank account'
       }, {
         from: 'bot',
-        text: 'Choose one of the options below to start'
-      }, {
-        from: 'bot',
-        text: 'login register'
+        text: 'How can I help you?'
       }],
       text: "",
       nextAction: "",
@@ -1918,7 +1917,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
       email: null,
       password: null,
       password_confirmation: null,
-      loggedIn: true,
+      loggedIn: false,
       amount: null,
       currencyCode: null
     };
@@ -1937,18 +1936,20 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         action = this.nextAction;
       } else {
         this.text = null;
-        actions = translateToAction(entry, this.loggedIn);
-        console.log(actions);
+        actions = translateToAction(entry);
 
         if (!actions.length || actions.length > 1) {
           this.botMessage("Sorry, I didn't undertand your request", ERROR);
           return;
         }
 
+        if (actions[0].mustBeLoggedin && !this.loggedIn) {
+          this.botMessage("You must be logged in to execute this action", ERROR);
+          return;
+        }
+
         action = actions[0].name;
       }
-
-      console.log(action);
 
       switch (action) {
         case 'register':
@@ -1992,7 +1993,6 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
             password: this.password,
             password_confirmation: this.password_confirmation
           };
-          console.log(registrationBody);
           this.loading = true;
           axios.post('/api/register', registrationBody).then(function (response) {
             _this.botMessage('Signed up successfully! You can now log in.', SUCCESS);
@@ -2025,10 +2025,6 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
             email: this.username,
             password: entry
           }).then(function (response) {
-            axios.get('/api/test-auth').then(function (_) {
-              return console.log(_);
-            });
-
             _this.botMessage('Login success!', SUCCESS);
 
             _this.loggedIn = true;
@@ -2154,7 +2150,9 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         amount: this.amount,
         currency_code: this.currencyCode
       }).then(function (response) {
-        return console.log(response);
+        _this3.botMessage('Deposit successful', SUCCESS);
+
+        _this3.getAccountBalance();
       })["catch"](function (error) {
         return _this3.showErrors(error.response.data);
       })["finally"](function () {
@@ -2170,9 +2168,13 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         amount: this.amount,
         currency_code: this.currencyCode
       }).then(function (response) {
-        return console.log(response);
+        _this4.botMessage('Withdraw successful', SUCCESS);
+
+        _this4.getAccountBalance();
       })["catch"](function (error) {
-        return _this4.showErrors(error.response.data);
+        _this4.showErrors(error.response.data);
+
+        _this4.getAccountBalance();
       })["finally"](function () {
         return _this4.loading = false;
       });
@@ -2288,35 +2290,33 @@ exports.defaultCurrencies = ["AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "A
 
 var actions = [{
   name: "login",
-  triggers: "login log-in"
+  triggers: "login log-in",
+  mustBeLoggedin: false
 }, {
   name: "register",
-  triggers: "signup register"
-}];
-var loggedinActions = [{
+  triggers: "signup register",
+  mustBeLoggedin: false
+}, {
   name: "deposit",
-  triggers: "deposit"
+  triggers: "deposit",
+  mustBeLoggedin: true
 }, {
   name: "withdraw",
-  triggers: "withdraw"
+  triggers: "withdraw",
+  mustBeLoggedin: true
 }, {
   name: "account-balance",
-  triggers: "balance funds"
+  triggers: "balance funds",
+  mustBeLoggedin: true
 }, {
   name: "logout",
-  triggers: "logout"
+  triggers: "logout",
+  mustBeLoggedin: true
 }];
 
 var translateToAction = function translateToAction(text) {
-  var loggedIn = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
   var sanitizedText = text.toLocaleLowerCase().replace("-", "");
-  var actionList = actions;
-
-  if (loggedIn) {
-    actionList = actionList.concat(loggedinActions);
-  }
-
-  var action = actionList.filter(function (action) {
+  var action = actions.filter(function (action) {
     var match = false;
     action.triggers.split(" ").forEach(function (trigger) {
       if (sanitizedText.indexOf(trigger) !== -1) {
@@ -2382,7 +2382,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -19993,63 +19993,69 @@ var render = function() {
   var _c = _vm._self._c || _h
   return _c("div", { staticClass: "container" }, [
     _c("div", { staticClass: "row" }, [
-      _c("div", { staticClass: "offset-md-3 col-md-6 border mt-5" }, [
+      _c("div", { staticClass: "offset-md-3 col-md-6 border mt-5 rounded" }, [
         _vm._m(0),
         _vm._v(" "),
         _c(
           "div",
           {
-            staticClass: "border mt-3 p-1",
+            staticClass: "border mt-3 p-3 rounded",
             staticStyle: { height: "400px", "overflow-x": "auto" },
             attrs: { id: "chat-messages" }
           },
           [
-            _vm._l(_vm.messages, function(message) {
-              return [
-                _c(
-                  "div",
-                  { class: { "text-right": message.from === "user" } },
-                  [
+            _c(
+              "div",
+              { staticStyle: { "margin-top": "300px" } },
+              [
+                _vm._l(_vm.messages, function(message) {
+                  return [
                     _c(
                       "div",
-                      {
-                        class: {
-                          "alert p-0 d-inline": true,
-                          "alert-success": message.type === "success",
-                          "alert-danger": message.type === "error",
-                          "alert-light": message.type === "light"
-                        },
-                        attrs: { role: "alert" }
-                      },
+                      { class: { "text-right": message.from === "user" } },
                       [
-                        _vm._v(
-                          "\n                            " +
-                            _vm._s(message.text) +
-                            "\n                        "
+                        _c(
+                          "div",
+                          {
+                            class: {
+                              "alert p-0 d-inline": true,
+                              "alert-success": message.type === "success",
+                              "alert-danger": message.type === "error",
+                              "alert-light": message.type === "light"
+                            },
+                            attrs: { role: "alert" }
+                          },
+                          [
+                            _vm._v(
+                              "\n                            " +
+                                _vm._s(message.text) +
+                                "\n                        "
+                            )
+                          ]
                         )
                       ]
                     )
                   ]
-                )
-              ]
-            }),
-            _vm._v(" "),
-            _vm.loading
-              ? _c(
-                  "div",
-                  {
-                    staticClass: "spinner-border spinner-border-sm",
-                    attrs: { role: "status" }
-                  },
-                  [
-                    _c("span", { staticClass: "sr-only" }, [
-                      _vm._v("Loading...")
-                    ])
-                  ]
-                )
-              : _vm._e()
-          ],
-          2
+                }),
+                _vm._v(" "),
+                _vm.loading
+                  ? _c(
+                      "div",
+                      {
+                        staticClass: "spinner-border spinner-border-sm",
+                        attrs: { role: "status" }
+                      },
+                      [
+                        _c("span", { staticClass: "sr-only" }, [
+                          _vm._v("Loading...")
+                        ])
+                      ]
+                    )
+                  : _vm._e()
+              ],
+              2
+            )
+          ]
         ),
         _vm._v(" "),
         _c("div", { staticClass: "row mt-3" }, [
