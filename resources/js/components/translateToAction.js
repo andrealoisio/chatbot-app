@@ -6,7 +6,7 @@ const actions = [
 const loggedinActions = [
     { name: "deposit", triggers: "deposit" },
     { name: "withdraw", triggers: "withdraw" },
-    { name: "show", triggers: "balance funds" },
+    { name: "account-balance", triggers: "balance funds" },
     { name: "logout", triggers: "logout" }
 ]
 

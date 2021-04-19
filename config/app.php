@@ -127,7 +127,7 @@ return [
 
     'currency_api_url' => env('CURRENCY_API_URL', null),
 
-    'currency_api_key' => env('CURRENCY_API_KEY', '782fd0a3c4253af5b9dc67b173a586d5'),
+    'currency_api_key' => env('CURRENCY_API_KEY', null),
 
     /*
     |--------------------------------------------------------------------------

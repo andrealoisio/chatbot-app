@@ -21,14 +21,6 @@
                         <span class="sr-only">Loading...</span>
                     </div>
                 </div>
-
-<!--                <div class="row">-->
-<!--                    <div class="col-10">-->
-<!--                    </div>-->
-<!--                    <div class="col-2">-->
-<!--                        <button type="button" class="btn btn-primary mb-2" @click="send(text)">Send</button>-->
-<!--                    </div>-->
-<!--                </div>-->
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="input-group mb-3">
@@ -36,7 +28,8 @@
                             <input :type="isTypingPassword ? 'password' : 'text'" class="form-control"
                                    id="inlineFormInputName2"
                                    placeholder="" v-model="text" v-on:keyup.enter="send(text)">
-                            <button @click="send(text)" class="btn btn-primary" type="button" id="button-addon2">Send</button>
+                            <button @click="send(text)" class="btn btn-primary" type="button" id="button-addon2">Send
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -84,17 +77,15 @@ export default {
             password: null,
             password_confirmation: null,
             loggedIn: true,
-            ammount: null,
+            amount: null,
             currencyCode: null
         }
     },
     methods: {
         send: function (text) {
-
-            var entry = null
+            var entry = text
             var action = null
             var actions = null
-            entry = text
             this.text = null
             this.userMessage(entry)
             if (this.nextAction) {
@@ -152,14 +143,8 @@ export default {
                     console.log(registrationBody)
                     this.loading = true
                     axios.post('/api/register', registrationBody).then(response => {
-                        console.log(response)
-                    }).catch(error => {
-                        if (error.response) {
-                            console.log(error.response)
-                            const {message} = error.response.data
-                            this.botMessage(message, ERROR)
-                        }
-                    }).finally(() => this.loading = false)
+                        this.botMessage('Signed up successfully! You can now log in.', SUCCESS)
+                    }).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
                     this.nextAction = null
                     this.clearValues()
                     break
@@ -181,7 +166,6 @@ export default {
                         email: this.username,
                         password: entry
                     }).then(response => {
-                        console.log(response);
                         axios.get('/api/test-auth').then(_ => console.log(_))
                         this.botMessage('Login success!', SUCCESS)
                         this.loggedIn = true
@@ -196,34 +180,42 @@ export default {
                     }).finally(() => this.loading = false)
                     break
                 case 'deposit':
-                    let extractedAmmount = util.extractMoney(entry)
-                    if (extractedAmmount) {
-                        this.ammount = extractedAmmount
+                    let extractedAmount = util.extractMoney(entry)
+                    if (extractedAmount) {
+                        this.amount = extractedAmount
                         this.currencyCode = util.extractCurrencyCode(entry)
-                        this.botMessage('Trying to send your deposit of ' + this.ammount + " " + this.currencyCode)
+                        this.sendDeposit()
                         this.clearValues()
                     } else {
-                        this.botMessage('Enter the ammout you want to deposit')
-                        this.nextAction = 'deposit-ask-ammount'
+                        this.botMessage('Enter the amount you want to deposit')
+                        this.nextAction = 'deposit-ask-amount'
                     }
                     break
-                case 'deposit-ask-ammount':
-                    let ammountAsked = util.extractMoney(entry)
-                    this.ammount = ammountAsked
-                    this.botMessage('Trying to send your deposit of ' + this.ammount)
+                case 'deposit-ask-amount':
+                    let amountAsked = util.extractMoney(entry)
+                    this.amount = amountAsked
+                    this.sendDeposit()
                     this.clearValues()
                     break
                 case 'withdraw':
-                    const withDrawAmmount = util.extractMoney(entry)
-                    if (withDrawAmmount) {
-                        this.ammount = withDrawAmmount
-                        this.botMessage('Trying to send your withdraw of ' + this.ammount)
+                    const withDrawAmount = util.extractMoney(entry)
+                    if (withDrawAmount) {
+                        this.amount = withDrawAmount
+                        this.sendWithdraw()
                         this.clearValues()
                     } else {
-                        this.botMessage('Enter the ammout you want to withdraw')
-                        this.nextAction = 'deposit-ask-ammount'
+                        this.botMessage('Enter the amount you want to withdraw')
+                        this.nextAction = 'withdraw-ask-amount'
                     }
                     break
+                    break
+                case 'withdraw-ask-amount':
+                    this.amount = util.extractMoney(entry)
+                    this.sendWithdraw()
+                    this.clearValues()
+                    break
+                case 'account-balance':
+                    this.getAccountBalance()
                     break
                 case 'logout':
                     this.loading = true
@@ -256,11 +248,39 @@ export default {
             })
             this.scroolChat()
         },
-        scroolChat: function() {
+        scroolChat: function () {
             setTimeout(() => {
-                let objet =this.$el.querySelector('#chat-messages')
+                let objet = this.$el.querySelector('#chat-messages')
                 objet.scrollTop = objet.scrollHeight;
-            },0)
+            }, 0)
+        },
+        sendDeposit: function () {
+            this.loading = true
+            axios.post('/api/transaction', {
+                type: 'DEPOSIT',
+                amount: this.amount,
+                currency_code: this.currencyCode
+            }).then(response => console.log(response)).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
+        },
+        sendWithdraw: function () {
+            this.loading = true
+            axios.post('/api/transaction', {
+                type: 'WITHDRAW',
+                amount: this.amount,
+                currency_code: this.currencyCode
+            }).then(response => console.log(response)).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
+        },
+        showErrors: function (errorObject) {
+            this.loading = true
+            Object.values(errorObject.errors).flatMap(error => error).forEach(
+                message => this.botMessage(message, ERROR)
+            )
+        },
+        getAccountBalance: function() {
+            axios.get('/api/account-balance').then(response => {
+                const { data } = response
+                this.botMessage('Your account balance: ' + data.account_balance + " " + data.default_currency, SUCCESS)
+            }).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
         },
         clearValues: function () {
             this.username = null
@@ -270,9 +290,30 @@ export default {
             this.nextAction = null
             this.isTypingPassword = false
             this.defaultCurrency = null
-            this.ammount = null
+            this.amount = null
             this.currencyCode = null
         },
     }
 };
 </script>
+<style>
+/* width */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #c1bfbf;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+</style>
