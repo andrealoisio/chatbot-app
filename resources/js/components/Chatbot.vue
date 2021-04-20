@@ -90,12 +90,16 @@ export default {
             } else {
                 this.text = null
                 actions = translateToAction(entry);
-                if (!actions.length || actions.length > 1) {
+                if (!actions.length) {
                     this.botMessage("Sorry, I did not undertand your request", ERROR)
                     return
                 }
+                if (actions.length > 1) {
+                    this.botMessage("Sorry, I can only execute an action at a time", ERROR)
+                    return
+                }
                 if (actions[0].mustBeLoggedin && !this.loggedIn) {
-                    this.botMessage("You must be logged in to execute this action", ERROR)
+                    this.botMessage("You must be logged in to execute this action. If you don't have an account you can sign-up for a new one.", ERROR)
                     return
                 }
                 action = actions[0].name

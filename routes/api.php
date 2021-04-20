@@ -20,10 +20,6 @@ use Illuminate\Support\Facades\Redis;
 |
 */
 
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
 Route::post('/register', [RegisterController::class, 'create']);
 Route::post('/login', [LoginController::class, 'authenticate']);
 Route::post('/logout', [LoginController::class, 'logout']);

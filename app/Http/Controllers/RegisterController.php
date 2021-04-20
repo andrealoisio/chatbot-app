@@ -22,7 +22,7 @@ class RegisterController extends Controller
 
         $transactionController = new TransactionController();
 
-        if ($transactionController->currency_code_is_invalid($currencyCode)) {
+        if (CurrencyController::currency_code_is_invalid($currencyCode)) {
             $validator->after(function ($validator) {
                 $validator->errors()->add(
                     'currency_code', 'Invalid currency code'

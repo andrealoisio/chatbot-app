@@ -1,5 +1,5 @@
 const actions = [
-    {name: "login", triggers: "login log-in log in", mustBeLoggedin: false},
+    {name: "login", triggers: "login log-in", mustBeLoggedin: false},
     {name: "register", triggers: "signup register", mustBeLoggedin: false},
     {name: "deposit", triggers: "deposit", mustBeLoggedin: true},
     {name: "withdraw", triggers: "withdraw", mustBeLoggedin: true},

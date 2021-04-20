@@ -33,6 +33,6 @@ $ ./vendor/bin/sail npm run prod
 ## How to use
 - There are the words that triggers actions on the chat
 ```
-help, login, log in, log-in, sign up, signup, logout, log-out, deposit, withdraw, balance, funds
+help, login, log-in, sign-up, signup, register, logout, log-out, deposit, withdraw, balance, funds
 ```
 - When using deposit or withdraw you can specify a currency code
