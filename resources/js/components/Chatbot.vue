@@ -26,11 +26,11 @@
                 <div class="row mt-3">
                     <div class="col-md-12">
                         <div class="input-group mb-3">
-                            <label class="sr-only" for="inlineFormInputName2">Name</label>
+                            <label class="sr-only" for="entry">Name</label>
                             <input :type="isTypingPassword ? 'password' : 'text'" class="form-control"
-                                   id="inlineFormInputName2"
+                                   id="entry"
                                    placeholder="" v-model="text" v-on:keyup.enter="send(text)">
-                            <button @click="send(text)" class="btn btn-primary" type="button" id="button-addon2">Send
+                            <button id="send" @click="send(text)" class="btn btn-primary" type="button">Send
                             </button>
                         </div>
                     </div>
@@ -49,7 +49,8 @@ const util = require('./util')
 
 export default {
     mounted() {
-        axios.post('/api/logout').then()
+        axios.get('/sanctum/csrf-cookie').then()
+        //axios.post('/api/logout').then()
         axios.get('/api/currency-code-list').then(response => this.currencyCodeList = response.data)
     },
     computed: {},
@@ -273,7 +274,10 @@ export default {
             }).then(response => {
                 this.botMessage('Deposit successful', SUCCESS)
                 this.getAccountBalance()
-            }).catch(error => this.showErrors(error.response.data)).finally(() => this.loading = false)
+            }).catch(error => {
+                console.log(error.response.data)
+                this.showErrors(error.response.data);
+            }).finally(() => this.loading = false)
         },
         sendWithdraw: function () {
             this.loading = true
@@ -290,7 +294,9 @@ export default {
             }).finally(() => this.loading = false)
         },
         showErrors: function (errorObject) {
-            this.loading = true
+            if (errorObject.message) {
+                this.botMessage(errorObject.message, ERROR)
+            }
             Object.values(errorObject.errors).flatMap(error => error).forEach(
                 message => this.botMessage(message, ERROR)
             )

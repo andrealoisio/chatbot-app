@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class LoginController extends Controller
 {
@@ -26,6 +27,8 @@ class LoginController extends Controller
                 'message' => 'The provided credentials do not match our records.'
             ], 401);
         }
+        Log::info('User logged in');
+        Log::info(\auth()->user());
     }
 
     public function logout(Request $request)
