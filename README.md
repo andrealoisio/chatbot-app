@@ -54,11 +54,11 @@ help, login, log-in, sign-up, signup, register, logout, log-out, deposit, withdr
 - When using deposit or withdraw you can specify a currency code
 
 ## Automated tests
-- To run automate browser tests use dusk
+- To run automate browser tests use dusk (it needs sail up and running)
 ```
 $ ./vendor/bin/sail dusk
 ```
-- To run some javascript unit tests use npm
+- To run some javascript unit tests use npm (it needs sail up and running)
 ```
 $ ./vendor/bin/sail npm run test
 ```
