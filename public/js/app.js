@@ -1940,7 +1940,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         actions = translateToAction(entry);
 
         if (!actions.length || actions.length > 1) {
-          this.botMessage("Sorry, I didn't undertand your request", ERROR);
+          this.botMessage("Sorry, I did not undertand your request", ERROR);
           return;
         }
 

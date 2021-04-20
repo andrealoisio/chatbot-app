@@ -91,7 +91,7 @@ export default {
                 this.text = null
                 actions = translateToAction(entry);
                 if (!actions.length || actions.length > 1) {
-                    this.botMessage("Sorry, I didn't undertand your request", ERROR)
+                    this.botMessage("Sorry, I did not undertand your request", ERROR)
                     return
                 }
                 if (actions[0].mustBeLoggedin && !this.loggedIn) {
