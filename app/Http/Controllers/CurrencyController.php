@@ -36,4 +36,8 @@ class CurrencyController extends Controller
         $rates = CurrencyController::get_rates();
         return ($rates[$code] ?? null) == null;
     }
+
+    public function currency_code_list() {
+        return array_keys((array) $this::get_rates());
+    }
 }

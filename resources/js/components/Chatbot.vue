@@ -50,6 +50,7 @@ const util = require('./util')
 export default {
     mounted() {
         axios.post('/api/logout').then()
+        axios.get('/api/currency-code-list').then(response => this.currencyCodeList = response.data)
     },
     computed: {},
     data() {
@@ -64,6 +65,7 @@ export default {
                     text: 'How can I help you?',
                 },
             ],
+            currencyCodeList: [],
             text: null,
             nextAction: null,
             loading: false,
@@ -183,7 +185,7 @@ export default {
                     let extractedAmount = util.extractMoney(entry)
                     if (extractedAmount) {
                         this.amount = extractedAmount
-                        this.currencyCode = util.extractCurrencyCode(entry)
+                        this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList)
                         this.sendDeposit()
                         this.clearValues()
                     } else {
@@ -193,7 +195,7 @@ export default {
                     break
                 case 'deposit-ask-amount':
                     this.amount = util.extractMoney(entry)
-                    this.currencyCode = util.extractCurrencyCode(entry)
+                    this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList)
                     this.sendDeposit()
                     this.clearValues()
                     break
@@ -201,7 +203,7 @@ export default {
                     const withDrawAmount = util.extractMoney(entry)
                     if (withDrawAmount) {
                         this.amount = withDrawAmount
-                        this.currencyCode = util.extractCurrencyCode(entry)
+                        this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList)
                         this.sendWithdraw()
                         this.clearValues()
                     } else {
@@ -211,7 +213,7 @@ export default {
                     break
                 case 'withdraw-ask-amount':
                     this.amount = util.extractMoney(entry)
-                    this.currencyCode = util.extractCurrencyCode(entry)
+                    this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList)
                     this.sendWithdraw()
                     this.clearValues()
                     break

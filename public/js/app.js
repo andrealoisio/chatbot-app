@@ -1897,7 +1897,12 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   mounted: function mounted() {
+    var _this = this;
+
     axios.post('/api/logout').then();
+    axios.get('/api/currency-code-list').then(function (response) {
+      return _this.currencyCodeList = response.data;
+    });
   },
   computed: {},
   data: function data() {
@@ -1909,6 +1914,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         from: 'bot',
         text: 'How can I help you?'
       }],
+      currencyCodeList: [],
       text: null,
       nextAction: null,
       loading: false,
@@ -1925,7 +1931,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
   },
   methods: {
     send: function send(text) {
-      var _this = this;
+      var _this2 = this;
 
       var entry = text;
       var action = null;
@@ -2001,11 +2007,11 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
           };
           this.loading = true;
           axios.post('/api/register', registrationBody).then(function (response) {
-            _this.botMessage('Signed up successfully! You can now log in.', SUCCESS);
+            _this2.botMessage('Signed up successfully! You can now log in.', SUCCESS);
           })["catch"](function (error) {
-            return _this.showErrors(error.response.data);
+            return _this2.showErrors(error.response.data);
           })["finally"](function () {
-            return _this.loading = false;
+            return _this2.loading = false;
           });
           this.nextAction = null;
           this.clearValues();
@@ -2031,23 +2037,23 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
             email: this.username,
             password: entry
           }).then(function (response) {
-            _this.botMessage('Login success!', SUCCESS);
+            _this2.botMessage('Login success!', SUCCESS);
 
-            _this.loggedIn = true;
+            _this2.loggedIn = true;
 
-            _this.clearValues();
+            _this2.clearValues();
           })["catch"](function (error) {
             if (error.response) {
               var _error$response$data = error.response.data,
                   type = _error$response$data.type,
                   message = _error$response$data.message;
 
-              _this.botMessage(message, type);
+              _this2.botMessage(message, type);
             } else {
-              _this.botMessage('Somethign went wrong!', ERROR);
+              _this2.botMessage('Somethign went wrong!', ERROR);
             }
           })["finally"](function () {
-            return _this.loading = false;
+            return _this2.loading = false;
           });
           break;
 
@@ -2056,7 +2062,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
 
           if (extractedAmount) {
             this.amount = extractedAmount;
-            this.currencyCode = util.extractCurrencyCode(entry);
+            this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList);
             this.sendDeposit();
             this.clearValues();
           } else {
@@ -2068,7 +2074,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
 
         case 'deposit-ask-amount':
           this.amount = util.extractMoney(entry);
-          this.currencyCode = util.extractCurrencyCode(entry);
+          this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList);
           this.sendDeposit();
           this.clearValues();
           break;
@@ -2078,7 +2084,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
 
           if (withDrawAmount) {
             this.amount = withDrawAmount;
-            this.currencyCode = util.extractCurrencyCode(entry);
+            this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList);
             this.sendWithdraw();
             this.clearValues();
           } else {
@@ -2090,7 +2096,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
 
         case 'withdraw-ask-amount':
           this.amount = util.extractMoney(entry);
-          this.currencyCode = util.extractCurrencyCode(entry);
+          this.currencyCode = util.extractCurrencyCode(entry, this.currencyCodeList);
           this.sendWithdraw();
           this.clearValues();
           break;
@@ -2102,11 +2108,11 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         case 'logout':
           this.loading = true;
           axios.post('/api/logout').then(function (response) {
-            _this.botMessage('Successfully logged out!', SUCCESS);
+            _this2.botMessage('Successfully logged out!', SUCCESS);
 
-            _this.loggedIn = false;
+            _this2.loggedIn = false;
           })["finally"](function () {
-            return _this.loading = false;
+            return _this2.loading = false;
           });
           break;
 
@@ -2149,16 +2155,16 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
       this.scroolChat();
     },
     scroolChat: function scroolChat() {
-      var _this2 = this;
+      var _this3 = this;
 
       setTimeout(function () {
-        var objet = _this2.$el.querySelector('#chat-messages');
+        var objet = _this3.$el.querySelector('#chat-messages');
 
         objet.scrollTop = objet.scrollHeight;
       }, 0);
     },
     sendDeposit: function sendDeposit() {
-      var _this3 = this;
+      var _this4 = this;
 
       this.loading = true;
       axios.post('/api/transaction', {
@@ -2166,17 +2172,17 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         amount: this.amount,
         currency_code: this.currencyCode
       }).then(function (response) {
-        _this3.botMessage('Deposit successful', SUCCESS);
+        _this4.botMessage('Deposit successful', SUCCESS);
 
-        _this3.getAccountBalance();
+        _this4.getAccountBalance();
       })["catch"](function (error) {
-        return _this3.showErrors(error.response.data);
+        return _this4.showErrors(error.response.data);
       })["finally"](function () {
-        return _this3.loading = false;
+        return _this4.loading = false;
       });
     },
     sendWithdraw: function sendWithdraw() {
-      var _this4 = this;
+      var _this5 = this;
 
       this.loading = true;
       axios.post('/api/transaction', {
@@ -2184,38 +2190,38 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         amount: this.amount,
         currency_code: this.currencyCode
       }).then(function (response) {
-        _this4.botMessage('Withdraw successful', SUCCESS);
+        _this5.botMessage('Withdraw successful', SUCCESS);
 
-        _this4.getAccountBalance();
+        _this5.getAccountBalance();
       })["catch"](function (error) {
-        _this4.showErrors(error.response.data);
+        _this5.showErrors(error.response.data);
 
-        _this4.getAccountBalance();
+        _this5.getAccountBalance();
       })["finally"](function () {
-        return _this4.loading = false;
+        return _this5.loading = false;
       });
     },
     showErrors: function showErrors(errorObject) {
-      var _this5 = this;
+      var _this6 = this;
 
       this.loading = true;
       Object.values(errorObject.errors).flatMap(function (error) {
         return error;
       }).forEach(function (message) {
-        return _this5.botMessage(message, ERROR);
+        return _this6.botMessage(message, ERROR);
       });
     },
     getAccountBalance: function getAccountBalance() {
-      var _this6 = this;
+      var _this7 = this;
 
       axios.get('/api/account-balance').then(function (response) {
         var data = response.data;
 
-        _this6.botMessage('Your account balance is ' + data.account_balance + " " + data.default_currency, SUCCESS);
+        _this7.botMessage('Your account balance is ' + data.account_balance + " " + data.default_currency, SUCCESS);
       })["catch"](function (error) {
-        return _this6.showErrors(error.response.data);
+        return _this7.showErrors(error.response.data);
       })["finally"](function () {
-        return _this6.loading = false;
+        return _this7.loading = false;
       });
     },
     clearValues: function clearValues() {
@@ -2402,7 +2408,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
