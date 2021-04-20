@@ -49,7 +49,7 @@ const util = require('./util')
 
 export default {
     mounted() {
-
+        axios.post('/api/logout').then()
     },
     computed: {},
     data() {
@@ -64,10 +64,9 @@ export default {
                     text: 'How can I help you?',
                 },
             ],
-            text: "",
-            nextAction: "",
+            text: null,
+            nextAction: null,
             loading: false,
-            acceptedEntries: ['register', 'login', 'logout'],
             isTypingPassword: false,
             username: null,
             defaultCurrency: null,
@@ -189,8 +188,8 @@ export default {
                     }
                     break
                 case 'deposit-ask-amount':
-                    let amountAsked = util.extractMoney(entry)
-                    this.amount = amountAsked
+                    this.amount = util.extractMoney(entry)
+                    this.currencyCode = util.extractCurrencyCode(entry)
                     this.sendDeposit()
                     this.clearValues()
                     break
@@ -198,6 +197,7 @@ export default {
                     const withDrawAmount = util.extractMoney(entry)
                     if (withDrawAmount) {
                         this.amount = withDrawAmount
+                        this.currencyCode = util.extractCurrencyCode(entry)
                         this.sendWithdraw()
                         this.clearValues()
                     } else {
@@ -205,9 +205,9 @@ export default {
                         this.nextAction = 'withdraw-ask-amount'
                     }
                     break
-                    break
                 case 'withdraw-ask-amount':
                     this.amount = util.extractMoney(entry)
+                    this.currencyCode = util.extractCurrencyCode(entry)
                     this.sendWithdraw()
                     this.clearValues()
                     break
@@ -220,6 +220,13 @@ export default {
                         this.botMessage('Successfully logged out!', SUCCESS)
                         this.loggedIn = false
                     }).finally(() => this.loading = false);
+                    break
+                case 'help':
+                    if (this.loggedIn) {
+                        this.botMessage('You are logged in. You can deposit, withdraw, and see your account balance')
+                    } else {
+                        this.botMessage('You are not logged in. You can log-in or sign-up')
+                    }
                     break
                 default:
                     this.botMessage('Invalid option', ERROR)

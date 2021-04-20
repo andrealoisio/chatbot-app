@@ -15,12 +15,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
-        $password = Hash::make('senhateste123');
+        $password = Hash::make('mygoodpassword123@');
         User::create([
-            'name' => 'André',
-            'email' => 'andrealoisio@gmail.com',
-            'password' => $password
+            'name' => 'Jack',
+            'email' => 'jack@test.com',
+            'password' => $password,
+            'default_currency' => 'USD'
         ]);
     }
 }

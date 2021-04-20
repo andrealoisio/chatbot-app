@@ -1,10 +1,11 @@
 const actions = [
-    {name: "login", triggers: "login log-in", mustBeLoggedin: false},
+    {name: "login", triggers: "login log-in log in", mustBeLoggedin: false},
     {name: "register", triggers: "signup register", mustBeLoggedin: false},
     {name: "deposit", triggers: "deposit", mustBeLoggedin: true},
     {name: "withdraw", triggers: "withdraw", mustBeLoggedin: true},
     {name: "account-balance", triggers: "balance funds", mustBeLoggedin: true},
-    {name: "logout", triggers: "logout", mustBeLoggedin: true}
+    {name: "logout", triggers: "logout", mustBeLoggedin: true},
+    {name: "help", triggers: "help", mustBeLoggedin: false},
 ]
 
 const translateToAction = (text) => {

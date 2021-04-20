@@ -1896,7 +1896,9 @@ var translateToAction = __webpack_require__(/*! ./translateToAction */ "./resour
 var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js");
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
-  mounted: function mounted() {},
+  mounted: function mounted() {
+    axios.post('/api/logout').then();
+  },
   computed: {},
   data: function data() {
     return {
@@ -1907,10 +1909,9 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
         from: 'bot',
         text: 'How can I help you?'
       }],
-      text: "",
-      nextAction: "",
+      text: null,
+      nextAction: null,
       loading: false,
-      acceptedEntries: ['register', 'login', 'logout'],
       isTypingPassword: false,
       username: null,
       defaultCurrency: null,
@@ -2061,8 +2062,8 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
           break;
 
         case 'deposit-ask-amount':
-          var amountAsked = util.extractMoney(entry);
-          this.amount = amountAsked;
+          this.amount = util.extractMoney(entry);
+          this.currencyCode = util.extractCurrencyCode(entry);
           this.sendDeposit();
           this.clearValues();
           break;
@@ -2072,6 +2073,7 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
 
           if (withDrawAmount) {
             this.amount = withDrawAmount;
+            this.currencyCode = util.extractCurrencyCode(entry);
             this.sendWithdraw();
             this.clearValues();
           } else {
@@ -2080,10 +2082,10 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
           }
 
           break;
-          break;
 
         case 'withdraw-ask-amount':
           this.amount = util.extractMoney(entry);
+          this.currencyCode = util.extractCurrencyCode(entry);
           this.sendWithdraw();
           this.clearValues();
           break;
@@ -2101,6 +2103,15 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
           })["finally"](function () {
             return _this.loading = false;
           });
+          break;
+
+        case 'help':
+          if (this.loggedIn) {
+            this.botMessage('You are logged in. You can deposit, withdraw, and see your account balance');
+          } else {
+            this.botMessage('You are not logged in. You can log-in or sign-up');
+          }
+
           break;
 
         default:
@@ -2290,7 +2301,7 @@ exports.defaultCurrencies = ["AED", "AFN", "ALL", "AMD", "ANG", "AOA", "ARS", "A
 
 var actions = [{
   name: "login",
-  triggers: "login log-in",
+  triggers: "login log-in log in",
   mustBeLoggedin: false
 }, {
   name: "register",
@@ -2312,6 +2323,10 @@ var actions = [{
   name: "logout",
   triggers: "logout",
   mustBeLoggedin: true
+}, {
+  name: "help",
+  triggers: "help",
+  mustBeLoggedin: false
 }];
 
 var translateToAction = function translateToAction(text) {
@@ -2382,7 +2397,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
