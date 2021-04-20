@@ -1899,7 +1899,8 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
   mounted: function mounted() {
     var _this = this;
 
-    axios.post('/api/logout').then();
+    axios.get('/sanctum/csrf-cookie').then(); //axios.post('/api/logout').then()
+
     axios.get('/api/currency-code-list').then(function (response) {
       return _this.currencyCodeList = response.data;
     });
@@ -2176,7 +2177,9 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
 
         _this4.getAccountBalance();
       })["catch"](function (error) {
-        return _this4.showErrors(error.response.data);
+        console.log(error.response.data);
+
+        _this4.showErrors(error.response.data);
       })["finally"](function () {
         return _this4.loading = false;
       });
@@ -2204,7 +2207,10 @@ var util = __webpack_require__(/*! ./util */ "./resources/js/components/util.js"
     showErrors: function showErrors(errorObject) {
       var _this6 = this;
 
-      this.loading = true;
+      if (errorObject.message) {
+        this.botMessage(errorObject.message, ERROR);
+      }
+
       Object.values(errorObject.errors).flatMap(function (error) {
         return error;
       }).forEach(function (message) {
@@ -2341,7 +2347,7 @@ var actions = [{
 }];
 
 var translateToAction = function translateToAction(text) {
-  var sanitizedText = text.toLocaleLowerCase().replace("-", "");
+  var sanitizedText = text.toLocaleLowerCase().replace("-", "").replace("?", "");
   var action = actions.filter(function (action) {
     var match = false;
     action.triggers.split(" ").forEach(function (trigger) {
@@ -2408,7 +2414,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/* width */\n::-webkit-scrollbar {\n    width: 10px;\n}\n\n/* Track */\n::-webkit-scrollbar-track {\n    background: #f1f1f1;\n}\n\n/* Handle */\n::-webkit-scrollbar-thumb {\n    background: #c1bfbf;\n}\n\n/* Handle on hover */\n::-webkit-scrollbar-thumb:hover {\n    background: #555;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
@@ -20087,14 +20093,9 @@ var render = function() {
         _c("div", { staticClass: "row mt-3" }, [
           _c("div", { staticClass: "col-md-12" }, [
             _c("div", { staticClass: "input-group mb-3" }, [
-              _c(
-                "label",
-                {
-                  staticClass: "sr-only",
-                  attrs: { for: "inlineFormInputName2" }
-                },
-                [_vm._v("Name")]
-              ),
+              _c("label", { staticClass: "sr-only", attrs: { for: "entry" } }, [
+                _vm._v("Name")
+              ]),
               _vm._v(" "),
               (_vm.isTypingPassword ? "password" : "text") === "checkbox"
                 ? _c("input", {
@@ -20107,11 +20108,7 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control",
-                    attrs: {
-                      id: "inlineFormInputName2",
-                      placeholder: "",
-                      type: "checkbox"
-                    },
+                    attrs: { id: "entry", placeholder: "", type: "checkbox" },
                     domProps: {
                       checked: Array.isArray(_vm.text)
                         ? _vm._i(_vm.text, null) > -1
@@ -20165,11 +20162,7 @@ var render = function() {
                       }
                     ],
                     staticClass: "form-control",
-                    attrs: {
-                      id: "inlineFormInputName2",
-                      placeholder: "",
-                      type: "radio"
-                    },
+                    attrs: { id: "entry", placeholder: "", type: "radio" },
                     domProps: { checked: _vm._q(_vm.text, null) },
                     on: {
                       keyup: function($event) {
@@ -20203,7 +20196,7 @@ var render = function() {
                     ],
                     staticClass: "form-control",
                     attrs: {
-                      id: "inlineFormInputName2",
+                      id: "entry",
                       placeholder: "",
                       type: _vm.isTypingPassword ? "password" : "text"
                     },
@@ -20237,7 +20230,7 @@ var render = function() {
                 "button",
                 {
                   staticClass: "btn btn-primary",
-                  attrs: { type: "button", id: "button-addon2" },
+                  attrs: { id: "send", type: "button" },
                   on: {
                     click: function($event) {
                       return _vm.send(_vm.text)

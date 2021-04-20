@@ -9,7 +9,7 @@ const actions = [
 ]
 
 const translateToAction = (text) => {
-    let sanitizedText = text.toLocaleLowerCase().replace("-", "")
+    let sanitizedText = text.toLocaleLowerCase().replace("-", "").replace("?", "")
 
     let action = actions.filter(action => {
         let match = false

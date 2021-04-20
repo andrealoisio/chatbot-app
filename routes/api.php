@@ -3,12 +3,7 @@
 use App\Http\Controllers\CurrencyController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\RegisterController;
-use App\Http\Controllers\TransactionController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Facades\Redis;
 
 /*
 |--------------------------------------------------------------------------
@@ -22,13 +17,6 @@ use Illuminate\Support\Facades\Redis;
 */
 
 Route::post('/register', [RegisterController::class, 'create']);
-Route::post('/login', [LoginController::class, 'authenticate']);
-Route::post('/logout', [LoginController::class, 'logout']);
 Route::get('/currency-code-list', [CurrencyController::class, 'currency_code_list']);
 
-Route::middleware(['auth:sanctum'])->group(function(){
-    Route::post('/transaction', [TransactionController::class, 'store']);
-    Route::get('/account-balance', function(){
-        return auth()->user(['name']);
-    });
-});
+

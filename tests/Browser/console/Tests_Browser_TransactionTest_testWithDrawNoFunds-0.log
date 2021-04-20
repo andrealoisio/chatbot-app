@@ -1,0 +1,8 @@
+[
+    {
+        "level": "SEVERE",
+        "message": "http:\/\/laravel.test\/api\/transaction - Failed to load resource: the server responded with a status of 422 (Unprocessable Entity)",
+        "source": "network",
+        "timestamp": 1618951328191
+    }
+]
