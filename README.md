@@ -13,6 +13,8 @@
 - Docker
 
 ### How to run the application
+- Run the following commands inside chatbot-app folder
+
 - Install laravel dependencies
 ```
 docker run --rm \
@@ -22,15 +24,20 @@ docker run --rm \
     laravelsail/php80-composer:latest \
     composer install --ignore-platform-reqs
 ```
-- Run the following commands inside chatbot-app folder
 ```
-$ cp .env.example .env
-$ ./vendor/bin/sail up -d
-$ ./vendor/bin/sail artisan migrate
-$ ./vendor/bin/sail artisan db:seed
-$ ./vendor/bin/sail npm install
-$ ./vendor/bin/sail npm run prod
+# When running the application for the first time
+$ ./setup.sh
+
+# To stop de application
+$ ./stop.sh
+
+# To start the application again
+$ ./start.sh
+
+# To stop the applications, remove the images, and volumes
+$ ./stop-and-clean.sh
  ```
+ \* You may need to use chmod in order to execute the .sh scripts
 
 - After that you can access the chatbot on http://localhost
 
